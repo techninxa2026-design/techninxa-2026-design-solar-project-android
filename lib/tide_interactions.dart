@@ -14,7 +14,7 @@ Future<T?> showTideSheet<T>(BuildContext context,{required String title,required
  child:Column(mainAxisSize:MainAxisSize.min,children:[
  const SizedBox(height:9),Container(width:40,height:4,decoration:BoxDecoration(color:s.outline,borderRadius:BorderRadius.circular(4))),
  Flexible(child:SingleChildScrollView(padding:const EdgeInsets.fromLTRB(16,12,16,20),child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
- ClipRRect(borderRadius:BorderRadius.circular(24),child:DecoratedBox(decoration:BoxDecoration(gradient:LinearGradient(colors:[contrast(s.primary),contrast(ocean)])),
+ ClipRRect(borderRadius:BorderRadius.circular(24),child:DecoratedBox(decoration:BoxDecoration(gradient:LinearGradient(colors:[contrast(s.primary),contrast(Color.lerp(s.primary,s.secondary,.55)!)])),
  child:Stack(children:[
  Positioned.fill(child:CustomPaint(painter:TideContour(Colors.white.withValues(alpha:.17)))),
  Padding(padding:const EdgeInsets.all(16),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
@@ -40,12 +40,12 @@ class _TideChoiceListState extends State<TideChoiceList>{
  final matches=widget.values.entries.where((e)=>tr(c,e.value).toLowerCase().contains(q)||e.value.toLowerCase().contains(q)).toList();
  return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
  if(widget.values.length>5)...[TextField(decoration:const InputDecoration(hintText:'Search options',prefixIcon:Icon(Icons.search_rounded)),onChanged:(v)=>setState(()=>query=v)),const SizedBox(height:12)],
- if(widget.multiple)...[CopyText(selected.length.toString()+' selected',style:Theme.of(c).textTheme.titleSmall),const SizedBox(height:8)],
+ if(widget.multiple)...[Wrap(spacing:12,runSpacing:8,crossAxisAlignment:WrapCrossAlignment.center,children:[CopyText(selected.length.toString()+' selected',style:Theme.of(c).textTheme.titleSmall),FilledButton.icon(onPressed:()=>Navigator.pop(c,selected),icon:const Icon(Icons.check_rounded),label:const CopyText('Apply selection'))]),const SizedBox(height:8)],
  if(matches.isEmpty)const TideEmpty(message:'No matching options.'),
  for(final entry in matches)Padding(padding:const EdgeInsets.only(bottom:7),child:TideSurface(tinted:selected.contains(entry.key),padding:const EdgeInsets.symmetric(horizontal:13,vertical:11),
  onTap:(){if(!widget.multiple){Navigator.pop(c,entry.key);return;}setState(()=>selected.contains(entry.key)?selected.remove(entry.key):selected.add(entry.key));},
  child:Row(children:[Icon(selected.contains(entry.key)?Icons.check_circle_rounded:widget.multiple?Icons.check_box_outline_blank_rounded:Icons.radio_button_unchecked,color:s.primary,size:22),const SizedBox(width:12),Expanded(child:CopyText(entry.value,style:Theme.of(c).textTheme.bodyLarge))]))),
- if(widget.multiple)...[const SizedBox(height:8),FilledButton.icon(onPressed:()=>Navigator.pop(c,selected),icon:const Icon(Icons.check_rounded),label:const CopyText('Apply selection'))],
+ if(widget.multiple&&matches.length>6)...[const SizedBox(height:8),FilledButton.icon(onPressed:()=>Navigator.pop(c,selected),icon:const Icon(Icons.check_rounded),label:const CopyText('Apply selection'))],
  ]);
  }
 }

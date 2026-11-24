@@ -38,6 +38,8 @@ void main(){
     await tester.pumpAndSettle();
     expect(find.text('Edit branding'),findsOneWidget);
     expect(find.text('Delete company'),findsOneWidget);
+    await tester.ensureVisible(find.text('Edit branding'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Edit branding'));
     await tester.pumpAndSettle();
     expect(tapped,'edit');
