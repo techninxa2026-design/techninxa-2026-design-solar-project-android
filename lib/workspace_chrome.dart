@@ -6,6 +6,7 @@ import 'copy.dart';
 Color workspaceBarColor(BuildContext context)=>
  Theme.of(context).appBarTheme.backgroundColor??const Color(0xff087eb1);
 const workspaceBarShape=BorderRadius.vertical(bottom:Radius.circular(26));
+const workspaceNavShape=BorderRadius.vertical(top:Radius.circular(26));
 
 class WorkspaceHeader extends StatelessWidget implements PreferredSizeWidget{
  final Widget logo;final String title,subtitle;final int unread;final bool approved;
@@ -52,13 +53,13 @@ class WorkspaceNavigation extends StatelessWidget{
  const WorkspaceNavigation({super.key,required this.items,required this.selected,required this.onSelect});
  @override Widget build(BuildContext c){
   final color=workspaceBarColor(c);
-  // Match the supplied reference: one continuous strip, square top edge,
-  // curved lower corners, evenly spaced icon-only destinations.
+  // Match the supplied reference: one continuous strip, curved upper corners,
+  // flush lower edge, evenly spaced icon-only destinations.
   return AnnotatedRegion<SystemUiOverlayStyle>(
    value:SystemUiOverlayStyle.light.copyWith(systemNavigationBarColor:color,systemNavigationBarDividerColor:color,systemNavigationBarIconBrightness:Brightness.light,systemNavigationBarContrastEnforced:false),
    child:Material(
     key:const ValueKey('workspace-navigation-strip'),
-    color:color,borderRadius:workspaceBarShape,clipBehavior:Clip.antiAlias,
+    color:color,borderRadius:workspaceNavShape,clipBehavior:Clip.antiAlias,
     child:SafeArea(top:false,child:SizedBox(height:58,child:Row(children:items.map((n){
      final active=n.key==selected;
      return Expanded(child:Semantics(button:true,selected:active,label:tr(c,n.label),

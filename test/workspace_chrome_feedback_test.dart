@@ -27,7 +27,9 @@ void main(){
    await tester.pumpAndSettle();
    final strip=tester.widget<Material>(find.byKey(const ValueKey('workspace-navigation-strip')));
    expect(strip.color,brand.deep);
-   expect(strip.borderRadius,workspaceBarShape);
+   expect(strip.borderRadius,workspaceNavShape);
+   expect(workspaceNavShape.topLeft,const Radius.circular(26));
+   expect(workspaceNavShape.bottomLeft,Radius.zero);
    final context=tester.element(find.byType(AppBar));
    expect(Theme.of(context).appBarTheme.backgroundColor,strip.color);
    expect(Theme.of(context).appBarTheme.foregroundColor,Colors.white);
@@ -55,6 +57,9 @@ void main(){
   expect(rect.width,390);expect(rect.height,greaterThan(780));
   expect(find.byType(InteractiveViewer),findsOneWidget);
   expect(find.byKey(const ValueKey('drag-position-1')),findsOneWidget);
+  expect(find.text('Company (Admin)'),findsOneWidget);
+  final viewer=tester.widget<InteractiveViewer>(find.byType(InteractiveViewer));
+  expect(viewer.transformationController!.value.getMaxScaleOnAxis(),greaterThanOrEqualTo(.85));
   expect(tester.takeException(),isNull);
   await tester.tap(find.byTooltip('Close hierarchy editor'));await tester.pumpAndSettle();
   expect(find.byType(InteractiveViewer),findsNothing);

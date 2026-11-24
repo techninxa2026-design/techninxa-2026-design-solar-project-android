@@ -107,16 +107,30 @@ class _HierarchyBoardState extends State<HierarchyBoard>{
   for(final p in records.where((x)=>!ids.contains(x[parent])||x[parent]==x['id'])){visit(p,0);}
   for(final p in records.where((x)=>!seen.contains(x['id']))){visit(p,0);}
   return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-   Padding(padding:const EdgeInsets.fromLTRB(4,0,4,8),child:Row(children:[
-    Expanded(child:CopyText(departments?'Departments':'Organization',style:t.textTheme.titleLarge,maxLines:1,overflow:TextOverflow.ellipsis)),
-    TextButton.icon(onPressed:()=>setState(()=>chart=!chart),icon:Icon(chart?Icons.view_list_rounded:Icons.account_tree_outlined),label:CopyText(chart?'List view':'Visual editor')),
-   ])),
-   Wrap(spacing:8,runSpacing:4,children:[
-    ChoiceChip(label:const CopyText('Positions'),selected:!departments,onSelected:(_)=>setState((){departments=false;focusId=null;collapsed.clear();query='';})),
-    ChoiceChip(label:const CopyText('Departments'),selected:departments,onSelected:(_)=>setState((){departments=true;focusId=null;collapsed.clear();query='';})),
-    if(widget.onOpenEditor!=null)FilledButton.icon(onPressed:widget.busy?null:()=>widget.onOpenEditor!(null,departments?'department':'position'),icon:const Icon(Icons.open_in_full_rounded),label:const CopyText('Edit hierarchy'))else if(!departments)FilledButton.tonalIcon(onPressed:widget.busy?null:widget.onCreate,icon:const Icon(Icons.add),label:const CopyText('Add position')),
-   ]),
-   const SizedBox(height:8),
+   LayoutBuilder(builder:(c,bounds){
+    final s=t.colorScheme;
+    return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+     if(bounds.maxWidth>=300)Container(height:54,margin:const EdgeInsets.only(bottom:6),decoration:BoxDecoration(gradient:LinearGradient(colors:[s.primary.withValues(alpha:.14),s.surface.withValues(alpha:.4)]),borderRadius:BorderRadius.circular(18)),child:Stack(children:[
+      Positioned(right:0,top:0,bottom:0,child:IgnorePointer(child:Opacity(opacity:.7,child:Image.asset('assets/solar_network.png',width:80,fit:BoxFit.contain)))),
+      Padding(padding:const EdgeInsets.fromLTRB(9,5,80,5),child:Row(children:[
+       Container(width:40,height:40,decoration:BoxDecoration(color:s.primary,borderRadius:BorderRadius.circular(12)),child:Icon(Icons.account_tree_rounded,color:s.onPrimary,size:23)),
+       const SizedBox(width:9),Expanded(child:FittedBox(fit:BoxFit.scaleDown,alignment:Alignment.centerLeft,child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisSize:MainAxisSize.min,children:[
+        CopyText('Organization Structure',style:t.textTheme.titleMedium),CopyText('Manage your company’s hierarchy',style:t.textTheme.bodySmall),
+       ]))),
+      ])),
+     ])),
+     Row(children:[
+      Expanded(child:_HierarchySegment(label:'Positions',icon:Icons.account_tree_outlined,selected:!departments,onTap:()=>setState((){departments=false;focusId=null;collapsed.clear();query='';}))),
+      const SizedBox(width:5),
+      Expanded(child:_HierarchySegment(label:'Departments',icon:Icons.layers_outlined,selected:departments,onTap:()=>setState((){departments=true;focusId=null;collapsed.clear();query='';}))),
+      IconButton(tooltip:chart?'List view':'Visual editor',onPressed:()=>setState(()=>chart=!chart),icon:Icon(chart?Icons.view_list_rounded:Icons.account_tree_outlined)),
+     ]),
+     Row(children:[
+      if(widget.onOpenEditor!=null)Expanded(child:TextButton.icon(onPressed:widget.busy?null:()=>widget.onOpenEditor!(null,departments?'department':'position'),icon:const Icon(Icons.open_in_full_rounded,size:18),label:const CopyText('Edit hierarchy'))),
+      if(!departments)Expanded(child:TextButton.icon(onPressed:widget.busy?null:widget.onCreate,icon:const Icon(Icons.add_rounded,size:18),label:const CopyText('Add position'))),
+     ]),
+    ]);
+   }),
    if(widget.busy)const LinearProgressIndicator(),
    Expanded(child:chart?_HierarchyGraph(key:ValueKey(departments),data:d,busy:widget.busy,onChange:widget.onChange,onEdit:widget.onOpenEditor==null?widget.onEdit:(row,kind)=>widget.onOpenEditor!(row,kind),onCreate:widget.onCreate,departments:departments,initialFocusId:focusId):ListView(children:[
     TideSurface(tinted:true,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
@@ -226,8 +240,9 @@ class _HierarchyGraph extends StatefulWidget{
  @override State<_HierarchyGraph> createState()=>_HierarchyGraphState();
 }
 class _HierarchyGraphState extends State<_HierarchyGraph>{
- bool get departments=>widget.departments;String search='';String tray='person';final transform=TransformationController();Size? viewport;bool initialized=false;bool dragging=false;HierarchyDrag? picked;final canvasKey=GlobalKey();
+ bool get departments=>widget.departments;String search='';String tray='person';final transform=TransformationController();Size? viewport;bool initialized=false;bool dragging=false;bool trayExpanded=true;HierarchyDrag? picked;final canvasKey=GlobalKey();
  @override void dispose(){transform.dispose();super.dispose();}
+ @override void didUpdateWidget(covariant _HierarchyGraph oldWidget){super.didUpdateWidget(oldWidget);if(!identical(oldWidget.data,widget.data))picked=null;}
  Map<String,dynamic> get d=>widget.data;
  List<Map<String,dynamic>> get positions=>rows(d['positions']);
  List<Map<String,dynamic>> get depts=>rows(d['departments']);
@@ -236,6 +251,25 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
  String dept(Map<String,dynamic> p)=>p['departmentId']==null?'Company-wide':depts.where((x)=>x['id']==p['departmentId']).firstOrNull?['name']?.toString()??'Department unavailable';
  String title(String kind,Map<String,dynamic> p)=>kind=='position'?role(p):(p['name']??p['fullName']??'Unavailable').toString();
  void zoom(double delta){final previous=transform.value.getMaxScaleOnAxis();final scale=(previous+delta).clamp(.2,1.6).toDouble();final center=viewport==null?Offset.zero:viewport!.center(Offset.zero);final scene=transform.toScene(center);final m=Matrix4.diagonal3Values(scale,scale,1);m.setTranslationRaw(center.dx-scene.dx*scale,center.dy-scene.dy*scale,0);transform.value=m;}
+ void openReadable(HierarchyLayout graph){
+  final size=viewport;if(size==null||size.width<=0)return;
+  final scale=math.min(1.0,math.max(.85,size.width/graph.width));
+  final m=Matrix4.diagonal3Values(scale,scale,1);
+  m.setTranslationRaw(size.width/2-graph.root.center.dx*scale,8,0);transform.value=m;
+ }
+ Widget rootCard(String kind){
+  final t=Theme.of(context);final s=t.colorScheme;
+  return target('root-'+kind,null,(highlight)=>Material(
+   color:highlight?s.primaryContainer:Color.alphaBlend(s.primary.withValues(alpha:.09),s.surface),
+   borderRadius:BorderRadius.circular(16),child:InkWell(onTap:widget.busy?null:()=>applyTarget('root-'+kind,null),borderRadius:BorderRadius.circular(16),
+    child:Container(decoration:BoxDecoration(border:Border.all(color:s.primary,width:highlight?3:1.4),borderRadius:BorderRadius.circular(16)),padding:const EdgeInsets.all(9),child:Row(children:[
+     Icon(Icons.apartment_rounded,color:s.primary,size:29),const SizedBox(width:8),
+     Expanded(child:Column(mainAxisAlignment:MainAxisAlignment.center,crossAxisAlignment:CrossAxisAlignment.start,children:[
+      Tooltip(message:d['companyAdministrator']?.toString()??'Company administrator',child:CopyText('Company (Admin)',style:t.textTheme.titleSmall,maxLines:1,overflow:TextOverflow.ellipsis)),
+      CopyText('Drop here to make top-level',style:t.textTheme.bodySmall?.copyWith(height:1.15),maxLines:2,overflow:TextOverflow.ellipsis),
+     ])),
+    ])))));
+ }
  void fit(HierarchyLayout graph){final size=viewport;if(size==null||size.width<=0||size.height<=0)return;final scale=math.min(size.width/graph.width,size.height/graph.height).clamp(.2,1.0).toDouble();final m=Matrix4.diagonal3Values(scale,scale,1);m.setTranslationRaw(math.max(0.0,(size.width-graph.width*scale)/2),math.max(0.0,(size.height-graph.height*scale)/2),0);transform.value=m;}
  Widget feedback(String text)=>Material(color:Colors.transparent,child:Container(width:210,padding:const EdgeInsets.all(14),decoration:BoxDecoration(color:Theme.of(context).colorScheme.primary,borderRadius:BorderRadius.circular(18)),child:Text(text,style:TextStyle(color:Theme.of(context).colorScheme.onPrimary,fontWeight:FontWeight.bold))));
  void edgePan(DragUpdateDetails details){
@@ -275,22 +309,29 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
   final sub=kind=='position'?person(p):positions.where((x)=>x['departmentId']==p['id']).length.toString()+' positions';
   final matches=search.isEmpty||[name,sub,if(kind=='position')dept(p)].join(' ').toLowerCase().contains(search);
   return target(kind,p,(highlight){
-   final card=Material(key:ValueKey('node-$kind-${p['id']}'),color:highlight?t.colorScheme.primaryContainer:t.colorScheme.surface,borderRadius:BorderRadius.circular(19),child:InkWell(
-    onTap:widget.busy?null:()=>picked!=null?applyTarget(kind,p):widget.onEdit(p,kind),borderRadius:BorderRadius.circular(19),child:Container(
-    padding:const EdgeInsets.all(12),decoration:BoxDecoration(border:Border.all(color:highlight?t.colorScheme.primary:t.colorScheme.outline,width:highlight?3:1),borderRadius:BorderRadius.circular(19)),
-    child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-     Row(children:[Icon(kind=='position'?Icons.badge_outlined:Icons.account_tree_outlined,color:t.colorScheme.primary,size:22),const Spacer(),handle(kind,p)]),
-     const SizedBox(height:7),CopyText(name,style:t.textTheme.titleSmall,maxLines:2,overflow:TextOverflow.ellipsis),
-     const SizedBox(height:5),CopyText(sub,style:t.textTheme.bodySmall,maxLines:2,overflow:TextOverflow.ellipsis),
-     if(kind=='position')CopyText(dept(p),style:t.textTheme.labelSmall,maxLines:1,overflow:TextOverflow.ellipsis),
-    ]))));
+   final s=t.colorScheme;
+   final card=Material(key:ValueKey('node-'+kind+'-'+p['id'].toString()),color:highlight?s.primaryContainer:s.surface,borderRadius:BorderRadius.circular(16),elevation:highlight?5:2,shadowColor:s.primary.withValues(alpha:.20),clipBehavior:Clip.antiAlias,child:InkWell(
+    onTap:widget.busy?null:()=>picked!=null?applyTarget(kind,p):widget.onEdit(p,kind),
+    child:Stack(children:[
+     Positioned(left:0,top:0,bottom:0,child:Container(width:4,color:s.primary)),
+     Positioned.fill(child:DecoratedBox(decoration:BoxDecoration(border:Border.all(color:highlight?s.primary:s.outlineVariant,width:highlight?2:1),borderRadius:BorderRadius.circular(16)))),
+     Padding(padding:const EdgeInsets.fromLTRB(11,8,4,8),child:Row(children:[
+      Container(width:32,height:36,decoration:BoxDecoration(color:s.primary.withValues(alpha:.12),borderRadius:BorderRadius.circular(10)),child:Icon(kind=='position'?Icons.person_outline_rounded:Icons.apartment_rounded,color:s.primary,size:21)),
+      const SizedBox(width:8),Expanded(child:Column(mainAxisAlignment:MainAxisAlignment.center,crossAxisAlignment:CrossAxisAlignment.start,children:[
+       CopyText(name,style:t.textTheme.titleSmall?.copyWith(fontWeight:FontWeight.w800,height:1.15),maxLines:2,overflow:TextOverflow.ellipsis),
+       const SizedBox(height:4),CopyText(sub,style:t.textTheme.bodySmall?.copyWith(height:1.15),maxLines:1,overflow:TextOverflow.ellipsis),
+       if(kind=='position')CopyText(dept(p),style:t.textTheme.bodySmall?.copyWith(height:1.15),maxLines:1,overflow:TextOverflow.ellipsis),
+      ])),
+      handle(kind,p),
+     ])),
+    ])));
    return drag(kind,p,Opacity(opacity:matches||highlight?1:.38,child:card));
   });
  }
  Widget roster(String label,String kind,List<Map<String,dynamic>> records){
   return Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
    CopyText(label,style:Theme.of(context).textTheme.titleSmall),const SizedBox(height:6),
-   if(records.isEmpty)const CopyText('No available items')else SizedBox(height:76,child:ListView.separated(scrollDirection:Axis.horizontal,itemCount:records.length,separatorBuilder:(_,__)=>const SizedBox(width:8),itemBuilder:(c,i){
+   if(records.isEmpty)const CopyText('No available items')else SizedBox(height:64,child:ListView.separated(scrollDirection:Axis.horizontal,itemCount:records.length,separatorBuilder:(_,__)=>const SizedBox(width:8),itemBuilder:(c,i){
     final p=records[i];
     final chip=TideSurface(onTap:widget.busy?null:()=>kind=='department'&&picked!=null?applyTarget(kind,p):select(HierarchyDrag(kind,p)),tinted:picked?.kind==kind&&picked?.row==p,padding:const EdgeInsets.symmetric(horizontal:10,vertical:6),child:Row(mainAxisSize:MainAxisSize.min,children:[Icon(kind=='person'?Icons.person_outline:kind=='role'?Icons.badge_outlined:Icons.apartment_outlined,size:20),const SizedBox(width:8),ConstrainedBox(constraints:const BoxConstraints(maxWidth:170),child:CopyText(title(kind,p),maxLines:2,overflow:TextOverflow.ellipsis)),const SizedBox(width:4),if(kind!='department')handle(kind,p)else const Icon(Icons.arrow_downward_rounded,size:19)]));
     return Center(child:kind=='department'?target(kind,p,(highlight)=>Container(decoration:BoxDecoration(border:Border.all(color:highlight?Theme.of(c).colorScheme.primary:Colors.transparent,width:2),borderRadius:BorderRadius.circular(20)),child:chip)):drag(kind,p,chip));
@@ -300,44 +341,55 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
  @override Widget build(BuildContext c){
   final kind=departments?'department':'position';final records=departments?depts:positions;
   final scale=MediaQuery.textScalerOf(c).scale(14)/14;
-  final graph=HierarchyLayout(records,departments?'parentDepartmentId':'parentPositionId',nodeW:math.max(220.0,220*scale),nodeH:math.max(182.0,182*scale));
+  final graph=HierarchyLayout(records,departments?'parentDepartmentId':'parentPositionId',nodeW:math.max(228.0,228*scale),nodeH:math.max(104.0,104*scale));
   final t=Theme.of(c);
   final keyboard=MediaQuery.viewInsetsOf(c).bottom>0;
   return LayoutBuilder(builder:(c,bounds){
    if(bounds.maxHeight<180)return const Center(child:CopyText('Use a taller window to edit the chart.'));
    return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-    if(!keyboard)Padding(padding:const EdgeInsets.only(bottom:5),child:CopyText('Drag the grip to move a card. Pinch to zoom.',style:t.textTheme.bodySmall)),
-    if(!keyboard)...[
-     Row(children:[Expanded(child:CopyText(departments?'Departments':'Positions',style:t.textTheme.titleSmall,maxLines:1,overflow:TextOverflow.ellipsis)),IconButton(tooltip:'Zoom out',onPressed:()=>zoom(-.15),icon:const Icon(Icons.remove)),IconButton(tooltip:'Fit chart',onPressed:()=>fit(graph),icon:const Icon(Icons.fit_screen_outlined)),IconButton(tooltip:'Zoom in',onPressed:()=>zoom(.15),icon:const Icon(Icons.add))]),
-     target('root-'+kind,null,(highlight)=>InkWell(onTap:widget.busy?null:()=>applyTarget('root-'+kind,null),borderRadius:BorderRadius.circular(17),child:AnimatedContainer(duration:const Duration(milliseconds:120),padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:highlight?t.colorScheme.primaryContainer:t.colorScheme.surface,border:Border.all(color:t.colorScheme.primary,width:highlight?3:1),borderRadius:BorderRadius.circular(17)),child:Row(children:[Icon(Icons.admin_panel_settings_outlined,color:t.colorScheme.primary),const SizedBox(width:10),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[CopyText(d['companyAdministrator']?.toString()??'Company administrator',style:t.textTheme.titleSmall,maxLines:1,overflow:TextOverflow.ellipsis),CopyText('Drop here to make top-level',style:t.textTheme.bodySmall)]))])))),
-     const SizedBox(height:8),
-    ],
+    if(!keyboard)Row(children:[
+     Expanded(child:Container(padding:const EdgeInsets.symmetric(horizontal:8,vertical:7),decoration:BoxDecoration(color:t.colorScheme.primary.withValues(alpha:.08),borderRadius:BorderRadius.circular(14)),child:Row(children:[
+      Icon(Icons.open_with_rounded,size:17,color:t.colorScheme.primary),const SizedBox(width:6),
+      Expanded(child:CopyText('Drag cards · Pinch to zoom',style:t.textTheme.bodySmall?.copyWith(height:1.15))),
+     ]))),
+     IconButton(tooltip:'Fit chart',onPressed:()=>fit(graph),icon:const Icon(Icons.fit_screen_outlined)),
+     IconButton(tooltip:'Zoom out',onPressed:()=>zoom(-.15),icon:const Icon(Icons.remove)),
+     IconButton(tooltip:'Zoom in',onPressed:()=>zoom(.15),icon:const Icon(Icons.add)),
+    ]),
     if(widget.busy)const LinearProgressIndicator(),
     if(picked!=null)Padding(padding:const EdgeInsets.only(bottom:6),child:Row(children:[Expanded(child:CopyText('Selected: '+title(picked!.kind,picked!.row)+' · tap a highlighted destination',style:t.textTheme.labelMedium)),IconButton(tooltip:'Cancel selection',onPressed:()=>setState(()=>picked=null),icon:const Icon(Icons.close))])),
     Expanded(child:records.isEmpty?const Center(child:TideEmpty(message:'No positions or departments configured.')):Container(
-     clipBehavior:Clip.antiAlias,decoration:BoxDecoration(color:t.colorScheme.surfaceContainerLowest,border:Border.all(color:t.colorScheme.outlineVariant),borderRadius:BorderRadius.circular(20)),
-     child:LayoutBuilder(builder:(c,b){viewport=Size(b.maxWidth,b.maxHeight);if(!initialized){initialized=true;WidgetsBinding.instance.addPostFrameCallback((_) {if(mounted){final target=graph.rects[widget.initialFocusId];if(target==null){fit(graph);}else{final size=viewport!;final scale=math.min(1.0,math.min(size.width/target.width,size.height/target.height)).clamp(.2,1.0).toDouble();final m=Matrix4.diagonal3Values(scale,scale,1);m.setTranslationRaw(size.width/2-target.center.dx*scale,size.height/2-target.center.dy*scale,0);transform.value=m;}}});}return InteractiveViewer(key:canvasKey,transformationController:transform,constrained:false,panEnabled:!dragging,scaleEnabled:!dragging,boundaryMargin:const EdgeInsets.all(300),minScale:.2,maxScale:1.6,
+     key:const ValueKey('hierarchy-canvas'),clipBehavior:Clip.antiAlias,decoration:BoxDecoration(gradient:LinearGradient(begin:Alignment.topLeft,end:Alignment.bottomRight,colors:[t.colorScheme.surface,t.colorScheme.primary.withValues(alpha:.10)]),border:Border.all(color:t.colorScheme.outlineVariant),borderRadius:BorderRadius.circular(22)),
+     child:LayoutBuilder(builder:(c,b){viewport=Size(b.maxWidth,b.maxHeight);if(!initialized){initialized=true;WidgetsBinding.instance.addPostFrameCallback((_) {if(mounted){final target=graph.rects[widget.initialFocusId];if(target==null){openReadable(graph);}else{final size=viewport!;final scale=math.min(1.0,math.min(size.width/target.width,size.height/target.height)).clamp(.2,1.0).toDouble();final m=Matrix4.diagonal3Values(scale,scale,1);m.setTranslationRaw(size.width/2-target.center.dx*scale,size.height/2-target.center.dy*scale,0);transform.value=m;}}});}return InteractiveViewer(key:canvasKey,transformationController:transform,constrained:false,panEnabled:!dragging,scaleEnabled:!dragging,boundaryMargin:const EdgeInsets.all(300),minScale:.2,maxScale:1.6,
       child:SizedBox(width:graph.width,height:graph.height,child:Stack(children:[
-       Positioned.fill(child:CustomPaint(painter:_Links(graph,t.colorScheme.primary.withValues(alpha:.5)))),
+       Positioned.fill(child:CustomPaint(painter:_Links(graph,t.colorScheme.primary.withValues(alpha:.65)))),
+       Positioned.fromRect(rect:graph.root,child:rootCard(kind)),
        for(final p in records)if(graph.rects[p['id']]!=null)Positioned.fromRect(rect:graph.rects[p['id']]!,child:node(kind,p)),
       ])));}),
     )),
-    if(!departments&&!keyboard&&bounds.maxHeight>280)...[
-     const SizedBox(height:8),
-     ConstrainedBox(constraints:BoxConstraints(maxHeight:math.min(156.0,bounds.maxHeight*.34)),child:SingleChildScrollView(child:TideSurface(padding:const EdgeInsets.all(9),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-      SingleChildScrollView(scrollDirection:Axis.horizontal,child:Row(children:[
-       for(final x in const [('person','Employees'),('role','Roles'),('department','Departments')])Padding(padding:const EdgeInsets.only(right:6),child:ChoiceChip(label:CopyText(x.$2),selected:tray==x.$1,onSelected:(_)=>setState((){tray=x.$1;picked=null;}))),
-      ])),
-      roster(tray=='person'?'Drag or tap employee':tray=='role'?'Drag or tap role':'Drop position here to transfer',tray,tray=='person'?rows(d['people']):tray=='role'?rows(d['roles']):depts),
-     ])))),
+    if(!departments&&!keyboard&&bounds.maxHeight>240)...[
+     const SizedBox(height:5),
+     Material(color:t.colorScheme.surface,elevation:3,shadowColor:t.colorScheme.primary.withValues(alpha:.15),borderRadius:const BorderRadius.vertical(top:Radius.circular(26)),clipBehavior:Clip.antiAlias,child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,mainAxisSize:MainAxisSize.min,children:[
+      InkWell(onTap:()=>setState(()=>trayExpanded=!trayExpanded),child:Padding(padding:const EdgeInsets.fromLTRB(12,5,8,2),child:Row(children:[
+       Expanded(child:Center(child:Container(width:34,height:4,decoration:BoxDecoration(color:t.colorScheme.outline,borderRadius:BorderRadius.circular(5))))),
+       Icon(trayExpanded?Icons.expand_more_rounded:Icons.expand_less_rounded,size:22,color:t.colorScheme.primary),
+      ]))),
+      if(trayExpanded)...[
+       Padding(padding:const EdgeInsets.symmetric(horizontal:7),child:Row(children:[
+        for(final x in const [('person','Employees',Icons.person_outline),('role','Roles',Icons.badge_outlined),('department','Departments',Icons.layers_outlined)])Expanded(child:Padding(padding:const EdgeInsets.symmetric(horizontal:2),child:_HierarchySegment(label:x.$2,icon:x.$3,selected:tray==x.$1,onTap:()=>setState((){tray=x.$1;picked=null;})))),
+       ])),
+       Padding(padding:const EdgeInsets.fromLTRB(8,5,8,7),child:roster(tray=='person'?'Drag or tap employee':tray=='role'?'Drag or tap role':'Drop position here to transfer',tray,tray=='person'?rows(d['people']):tray=='role'?rows(d['roles']):depts)),
+      ]else Padding(padding:const EdgeInsets.fromLTRB(14,0,14,8),child:CopyText('Employees · Roles · Departments',style:t.textTheme.bodySmall)),
+     ])),
     ],
+
    ]);
   });
  }
 }
 
 class HierarchyLayout{
- final Map<dynamic,Rect> rects={};final List<(dynamic,dynamic)> edges=[];
+ final Map<dynamic,Rect> rects={};final List<(dynamic,dynamic)> edges=[];final List<dynamic> roots=[];late final Rect root;
  late final double width,height;
  HierarchyLayout(List<Map<String,dynamic>> records,String parent,{required double nodeW,required double nodeH}){
   final byId={for(final p in records)p['id']:p};final children=<dynamic,List<dynamic>>{};
@@ -348,19 +400,34 @@ class HierarchyLayout{
    deepest=math.max(deepest,depth);final xs=<double>[];
    for(final child in children[id]??[]){if(!visited.contains(child)){xs.add(place(child,depth+1));edges.add((id,child));}}
    final double x;if(xs.isEmpty){x=cursor;cursor+=nodeW+28;}else{x=(xs.first+xs.last)/2;}
-   rects[id]=Rect.fromLTWH(x,18+depth*(nodeH+46),nodeW,nodeH);return x;
+   rects[id]=Rect.fromLTWH(x,102+depth*(nodeH+34),nodeW,nodeH);return x;
   }
-  for(final p in records){if(!byId.containsKey(p[parent])||p[parent]==p['id'])place(p['id'],0);}
-  for(final p in records){if(!visited.contains(p['id']))place(p['id'],0);}
-  width=math.max(nodeW+36,cursor);height=math.max(nodeH+36,36+(deepest+1)*nodeH+deepest*46);
+  for(final p in records){if(!byId.containsKey(p[parent])||p[parent]==p['id']){if(!visited.contains(p['id'])){roots.add(p['id']);place(p['id'],0);}}}
+  for(final p in records){if(!visited.contains(p['id'])){roots.add(p['id']);place(p['id'],0);}}
+  width=math.max(nodeW+36,cursor);height=math.max(180.0,120+(deepest+1)*nodeH+deepest*34);
+  final center=roots.isEmpty?width/2:(rects[roots.first]!.center.dx+rects[roots.last]!.center.dx)/2;
+  root=Rect.fromLTWH(center-nodeW/2,12,nodeW,76);
  }
 }
 class _Links extends CustomPainter{
  final HierarchyLayout graph;final Color color;const _Links(this.graph,this.color);
  @override void paint(Canvas canvas,Size size){
   final pen=Paint()..color=color..style=PaintingStyle.stroke..strokeWidth=2;
+  for(final id in graph.roots){final a=graph.root.bottomCenter,b=graph.rects[id]!.topCenter,mid=(a.dy+b.dy)/2;canvas.drawPath(Path()..moveTo(a.dx,a.dy)..lineTo(a.dx,mid)..lineTo(b.dx,mid)..lineTo(b.dx,b.dy),pen);}
   for(final e in graph.edges){final a=graph.rects[e.$1]!,b=graph.rects[e.$2]!;final start=a.bottomCenter,end=b.topCenter,mid=(start.dy+end.dy)/2;
    canvas.drawPath(Path()..moveTo(start.dx,start.dy)..lineTo(start.dx,mid)..lineTo(end.dx,mid)..lineTo(end.dx,end.dy),pen);}
  }
  @override bool shouldRepaint(covariant _Links old)=>old.graph!=graph||old.color!=color;
+}
+
+class _HierarchySegment extends StatelessWidget{
+ final String label;final IconData icon;final bool selected;final VoidCallback onTap;
+ const _HierarchySegment({required this.label,required this.icon,required this.selected,required this.onTap});
+ @override Widget build(BuildContext c){
+  final s=Theme.of(c).colorScheme;
+  return Semantics(button:true,selected:selected,label:tr(c,label),child:Material(color:selected?s.primary:s.surface,borderRadius:BorderRadius.circular(13),child:InkWell(onTap:onTap,borderRadius:BorderRadius.circular(13),child:Container(height:44,padding:const EdgeInsets.symmetric(horizontal:5),decoration:BoxDecoration(border:Border.all(color:selected?s.primary:s.outlineVariant),borderRadius:BorderRadius.circular(13)),child:Row(mainAxisAlignment:MainAxisAlignment.center,children:[
+   Icon(icon,size:17,color:selected?s.onPrimary:s.primary),const SizedBox(width:4),
+   Flexible(child:CopyText(label,style:TextStyle(color:selected?s.onPrimary:s.onSurface,fontSize:12,fontWeight:FontWeight.w700),maxLines:1,overflow:TextOverflow.ellipsis)),
+  ])))));
+ }
 }
