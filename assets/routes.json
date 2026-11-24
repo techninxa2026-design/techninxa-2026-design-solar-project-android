@@ -568,12 +568,12 @@
       },
       {
         "key": "mobile",
-        "required": true,
+        "required": false,
         "kind": "text"
       },
       {
         "key": "address",
-        "required": true,
+        "required": false,
         "kind": "text"
       },
       {
@@ -608,12 +608,12 @@
       },
       {
         "key": "mobile",
-        "required": true,
+        "required": false,
         "kind": "text"
       },
       {
         "key": "address",
-        "required": true,
+        "required": false,
         "kind": "text"
       },
       {
@@ -826,7 +826,7 @@
       },
       {
         "key": "Invite",
-        "required": false,
+        "required": true,
         "kind": "text"
       }
     ],
@@ -1398,11 +1398,6 @@
         "key": "name",
         "required": true,
         "kind": "text"
-      },
-      {
-        "key": "code",
-        "required": false,
-        "kind": "text"
       }
     ],
     "public": false
@@ -1471,7 +1466,7 @@
       },
       {
         "key": "areaId",
-        "required": false,
+        "required": true,
         "kind": "text"
       },
       {
@@ -1542,11 +1537,6 @@
       {
         "key": "name",
         "required": true,
-        "kind": "text"
-      },
-      {
-        "key": "code",
-        "required": false,
         "kind": "text"
       }
     ],
@@ -2776,7 +2766,7 @@
       },
       {
         "key": "clientId",
-        "required": false,
+        "required": true,
         "kind": "text"
       },
       {
@@ -2931,7 +2921,7 @@
       },
       {
         "key": "clientId",
-        "required": false,
+        "required": true,
         "kind": "text"
       },
       {

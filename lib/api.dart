@@ -12,8 +12,10 @@ class ApiFailure implements Exception {
   final int status;
   final String message;
   final String? code;
-  ApiFailure(this.status,this.message,[this.code]);
-  @override String toString()=>message;
+  final String? traceId;
+  final List<String> fields;
+  ApiFailure(this.status,this.message,[this.code,this.traceId,this.fields=const []]);
+  @override String toString()=>[message,if(status>0)'HTTP $status',if(fields.isNotEmpty)'Check: ${fields.join(', ')}',if(traceId!=null)'Reference: $traceId'].join('\n');
 }
 class Upload {
   final String name;
@@ -70,6 +72,7 @@ class Api extends ChangeNotifier {
   Future<dynamic> request(String method,String path,{bool auth=true,String mode='none',Map<String,dynamic> data=const{},Map<String,dynamic> query=const{},bool binary=false}) async {
     if(!path.startsWith('/')||path.contains('..')||path.contains('?')||path.contains('#')||path.contains('://'))throw ApiFailure(400,'Invalid API path.');
     if(auth&&_access==null)await refresh();
+    if(path.startsWith('/commands/')&&method=='POST'&&mode!='urlencoded'&&mode!='formdata')throw ApiFailure(400,'This operation requires form data.');
     final used=_access;
     final resp=await _send(method,path,auth,mode,data,query,binary);
     if(resp.statusCode==401&&auth&&_refresh!=null){if(_access==used)await refresh(); if(method!='GET')throw ApiFailure(401,'Session renewed. Review and submit the action again.');return _decode(await _send(method,path,auth,mode,data,query,binary),binary);}
@@ -86,18 +89,53 @@ class Api extends ChangeNotifier {
       // Multipart supports repeated form keys by indexing arrays before submission.
       if(mode=='formdata'||data.values.any((v)=>v is Upload)){
         final m=http.MultipartRequest(method,uri);for(final e in data.entries){if(e.value is Upload){final u=e.value as Upload;m.files.add(http.MultipartFile.fromBytes(e.key,u.bytes,filename:u.name));}else if(e.value!=null)m.fields[e.key]=e.value.toString();} req=m;
-      }else{final r=http.Request(method,uri);r.bodyFields=data.map((k,v)=>MapEntry(k,v.toString()));req=r;}
+      }else{final r=http.Request(method,uri);r.headers['Content-Type']='application/x-www-form-urlencoded; charset=utf-8';r.bodyFields={for(final e in data.entries)if(e.value!=null)e.key:e.value.toString()};req=r;}
     }else{final r=http.Request(method,uri);if(mode=='raw'){r.headers['Content-Type']='application/json';r.body=jsonEncode(data);}req=r;}
     req.headers.addAll(headers);req.followRedirects=false;
     try{return await (() async {final res=await _http.send(req);return http.Response.fromStream(res);})().timeout(const Duration(seconds:35));}
     on TimeoutException {throw ApiFailure(0,'Request timed out. Check the record before retrying a change.');}on http.ClientException{throw ApiFailure(0,'Connection failed. Check your internet connection.');}
   }
+  // Only expose bounded application-level errors, never HTML, credentials or stack traces.
+  String? _safeTitle(dynamic value){
+    if(value is! String||value.isEmpty||value.length>500||
+       RegExp(r'exception|stack trace|microsoft\\.|select\\s.+from|[<>\\r\\n]',caseSensitive:false).hasMatch(value))return null;
+    return value;
+  }
+  String? _trace(http.Response r,Map<String,dynamic> e){
+    final x=(e['traceId']??r.headers['x-idcolda-trace'])?.toString();
+    return x!=null&&RegExp(r'^[A-Za-z0-9:._-]{1,128}$').hasMatch(x)?x:null;
+  }
   dynamic _decode(http.Response r,bool binary){
-    if(r.statusCode>=200&&r.statusCode<300){if(binary)return r.bodyBytes;if(r.bodyBytes.isEmpty)return null;try{return jsonDecode(utf8.decode(r.bodyBytes));}catch(_){throw ApiFailure(502,'Unexpected non-JSON API response.');}}
-    Map<String,dynamic> e={};try{e=obj(jsonDecode(utf8.decode(r.bodyBytes)));}catch(_){}
-    final status=r.statusCode;final message=switch(status){400=>'Check the submitted fields.',401=>'Authentication required or session expired.',403=>'You do not have access to this action.',404=>'Record not found.',409=>'The record changed or additional verification is needed.',429=>'Too many requests. Try again later.',503=>'The service is temporarily unavailable.',_=>'Request failed (HTTP $status).'};
-    final detail=status==400&&e['title'] is String&&(e['title'] as String).length<500?' ${e['title']}':'';
-    throw ApiFailure(status,'$message$detail',e['code']?.toString());
+    final status=r.statusCode;
+    if(status>=200&&status<300){
+      if(binary)return r.bodyBytes;
+      if(r.bodyBytes.isEmpty)return null;
+      try{return jsonDecode(utf8.decode(r.bodyBytes));}
+      catch(_){throw ApiFailure(502,'Unexpected non-JSON API response. Check whether the request already saved before retrying.',null,_trace(r,{}));}
+    }
+    Map<String,dynamic> e={};
+    try{e=obj(jsonDecode(utf8.decode(r.bodyBytes)));}catch(_){}
+    final fields=<String>{};
+    if(e['fields'] is List)fields.addAll((e['fields'] as List).whereType<String>());
+    if(e['errors'] is Map)fields.addAll(obj(e['errors']).keys);
+    final safeFields=fields.where((x)=>RegExp(r'^[A-Za-z0-9_.\\[\\]]{1,100}$').hasMatch(x)).take(15).toList();
+    final fallback=switch(status){
+      400=>'Check the submitted fields.',
+      401=>'Authentication required or session expired.',
+      403=>'You do not have access to this action.',
+      404=>'Record not found.',
+      405=>'This HTTP operation is not allowed by the server.',
+      409=>'The record changed or additional verification is needed.',
+      413=>'The submitted file or form is too large.',
+      415=>'The server rejected the request content type.',
+      429=>'Too many requests. Try again later.',
+      503=>'The service is temporarily unavailable.',
+      >=300 && <400=>'The API unexpectedly redirected. Check server authentication and routing.',
+      _=>'Request failed.',
+    };
+    final detail=status>=400&&status<500?_safeTitle(e['title']):null;
+    final code=e['code']?.toString();
+    throw ApiFailure(status,detail??fallback,code,_trace(r,e),safeFields);
   }
   @override void dispose(){_http.close();super.dispose();}
 }
