@@ -359,7 +359,7 @@ class HierarchyTree extends StatelessWidget {
     if(depth>14||!visited.add(p['id']))return;
     final role=(roleMap[p['roleCode']]??p['roleCode']??'Position').toString();
     final person=(people[p['userId']]??'Unassigned').toString();
-    out.add(Padding(padding:EdgeInsets.only(left:depth.clamp(0,4)*10.0,top:6,bottom:6),child:Row(children:[
+    out.add(Padding(padding:EdgeInsets.only(left:depth.clamp(0,4).toDouble()*10.0,top:6,bottom:6),child:Row(children:[
       if(depth>0)Padding(padding:const EdgeInsets.only(right:7),child:Icon(Icons.subdirectory_arrow_right_rounded,size:18,color:Theme.of(c).colorScheme.primary)),
       Expanded(child:TideSurface(onTap:()=>onOpen(p),padding:const EdgeInsets.all(12),child:Row(children:[
         TideAvatar(person,size:40),const SizedBox(width:10),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
