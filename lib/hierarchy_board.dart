@@ -94,7 +94,7 @@ class _HierarchyBoardState extends State<HierarchyBoard>{
   final keyboard=MediaQuery.viewInsetsOf(c).bottom>0;
   return LayoutBuilder(builder:(c,bounds){
    return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-    ConstrainedBox(constraints:BoxConstraints(maxHeight:bounds.maxHeight*(keyboard?.58:.39)),child:SingleChildScrollView(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+    ConstrainedBox(constraints:BoxConstraints(maxHeight:bounds.maxHeight*(keyboard ? 0.58 : 0.39)),child:SingleChildScrollView(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
      Row(children:[Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
        CopyText(d['companyAdministrator']?.toString()??'Company administrator',style:t.textTheme.titleMedium),
        const CopyText('Company-wide organizational root'),
