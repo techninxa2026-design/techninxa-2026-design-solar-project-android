@@ -17,7 +17,7 @@ void main(){
   addTearDown(tester.view.resetPhysicalSize);addTearDown(tester.view.resetDevicePixelRatio);
   String? chosen;
   await tester.pumpWidget(MaterialApp(home:Scaffold(appBar:WorkspaceHeader(logo:const Icon(Icons.sunny,size:44),title:'A long company workspace name',subtitle:'Company workspace',unread:4,approved:true,onNotifications:(){},onAccount:(){},onSearch:(){}),body:const SizedBox(),bottomNavigationBar:WorkspaceNavigation(items:const [WorkspaceNavItem('home','Home',Icons.home),WorkspaceNavItem('tasks','Tasks',Icons.task),WorkspaceNavItem('stores','Stores',Icons.store),WorkspaceNavItem('modules','Modules',Icons.apps),WorkspaceNavItem('account','Account',Icons.person)],selected:'home',onSelect:(x)=>chosen=x))));
-  await tester.tap(find.text('Tasks'));await tester.pumpAndSettle();expect(chosen,'tasks');expect(tester.takeException(),isNull);
+  await tester.tap(find.byKey(const ValueKey('nav-tasks')));await tester.pumpAndSettle();expect(chosen,'tasks');expect(find.text('Tasks'),findsNothing);expect(find.byTooltip('Tasks'),findsOneWidget);expect(tester.takeException(),isNull);
  });
  testWidgets('Actual drag handle emits the same move as MVC',(tester)async{
   tester.view.physicalSize=const Size(760,1050);tester.view.devicePixelRatio=1;
