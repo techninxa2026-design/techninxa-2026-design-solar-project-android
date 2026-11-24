@@ -491,7 +491,8 @@
       {
         "key": "slug",
         "required": true,
-        "kind": "path"
+        "kind": "path",
+        "hidden": true
       }
     ],
     "public": true
@@ -506,7 +507,8 @@
       {
         "key": "slug",
         "required": true,
-        "kind": "path"
+        "kind": "path",
+        "hidden": true
       },
       {
         "key": "email",
@@ -526,7 +528,8 @@
       {
         "key": "slug",
         "required": true,
-        "kind": "path"
+        "kind": "path",
+        "hidden": true
       },
       {
         "key": "invite",
@@ -762,7 +765,8 @@
       {
         "key": "slug",
         "required": true,
-        "kind": "path"
+        "kind": "path",
+        "hidden": true
       },
       {
         "key": "FullName",
@@ -797,7 +801,8 @@
       {
         "key": "slug",
         "required": true,
-        "kind": "path"
+        "kind": "path",
+        "hidden": true
       },
       {
         "key": "Email",
@@ -821,13 +826,14 @@
       },
       {
         "key": "ReferrerNames",
-        "required": false,
+        "required": true,
         "kind": "multi"
       },
       {
         "key": "Invite",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       }
     ],
     "public": true
@@ -847,7 +853,9 @@
       {
         "key": "Track",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true,
+        "default": "General"
       },
       {
         "key": "ZoneId",
@@ -1037,7 +1045,8 @@
       {
         "key": "approve",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       }
     ],
     "public": false
@@ -1082,11 +1091,6 @@
       {
         "key": "name",
         "required": true,
-        "kind": "text"
-      },
-      {
-        "key": "kind",
-        "required": false,
         "kind": "text"
       },
       {
@@ -1822,7 +1826,8 @@
       {
         "key": "expectedUpdatedUtc",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       }
     ],
     "public": false
@@ -1847,7 +1852,8 @@
       {
         "key": "expectedUpdatedUtc",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       }
     ],
     "public": false
@@ -1872,7 +1878,8 @@
       {
         "key": "expectedUpdatedUtc",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       }
     ],
     "public": false
@@ -1912,7 +1919,8 @@
       {
         "key": "expectedUpdatedUtc",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       }
     ],
     "public": false
@@ -1932,7 +1940,8 @@
       {
         "key": "expectedUpdatedUtc",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       }
     ],
     "public": false
@@ -2082,7 +2091,8 @@
       {
         "key": "CompanyKind",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       }
     ],
     "public": false
@@ -2102,7 +2112,8 @@
       {
         "key": "active",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       }
     ],
     "public": false
@@ -2162,7 +2173,8 @@
       {
         "key": "approve",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       }
     ],
     "public": false
@@ -2596,7 +2608,7 @@
       },
       {
         "key": "InitialQuantity",
-        "required": false,
+        "required": true,
         "kind": "text"
       },
       {
@@ -3037,7 +3049,8 @@
       {
         "key": "decision",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       },
       {
         "key": "note",
@@ -3082,7 +3095,8 @@
       {
         "key": "progress",
         "required": true,
-        "kind": "text"
+        "kind": "text",
+        "hidden": true
       },
       {
         "key": "note",
