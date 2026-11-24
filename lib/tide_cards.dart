@@ -105,11 +105,7 @@ class TideMetric extends StatelessWidget {
     final t=Theme.of(context);
     return TideSurface(tinted:true,onTap:onTap,child:Column(
       crossAxisAlignment:CrossAxisAlignment.start,children:[
-        Row(children:[
-          TideGlyph(icon,size:42),
-          const Spacer(),
-          if(onTap!=null)Icon(Icons.arrow_outward,size:19,color:t.colorScheme.primary),
-        ]),
+        Row(children:[TideGlyph(icon,size:42),const Spacer(),if(onTap!=null)Icon(Icons.arrow_outward,size:19,color:t.colorScheme.primary)]),
         const SizedBox(height:15),
         CopyText(value,style:t.textTheme.headlineLarge?.copyWith(
           color:t.colorScheme.primary,fontWeight:FontWeight.w900,letterSpacing:-1)),

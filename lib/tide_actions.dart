@@ -74,10 +74,10 @@ class CompanyIdentityCard extends StatelessWidget {
     final rawAddress=data['address']?.toString().trim()??'';
     return TideSurface(onTap:onTap,padding:EdgeInsets.zero,child:Column(
       crossAxisAlignment:CrossAxisAlignment.start,children:[
-        Container(height:5,decoration:BoxDecoration(gradient:LinearGradient(colors:[brand.deep,brand.accent]))),
+        Container(height:9,decoration:BoxDecoration(gradient:LinearGradient(colors:[brand.deep,brand.accent]))),
         Padding(padding:const EdgeInsets.all(16),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
           Row(crossAxisAlignment:CrossAxisAlignment.start,children:[
-            CompanyLogo(api:api,brand:brand,companyId:data['id']),
+            CompanyLogo(api:api,brand:brand,companyId:data['id'],size:72),
             const SizedBox(width:13),
             Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
               CopyText(brand.name,style:t.textTheme.titleLarge),
@@ -179,9 +179,7 @@ class TideActionDock extends StatelessWidget {
     if(actions.isEmpty)return const SizedBox.shrink();
     final primary=actions.where((a)=>!a.destructive).firstOrNull;
     final rest=actions.where((a)=>!identical(a,primary)).toList();
-    if(compact)return Align(alignment:Alignment.centerRight,child:TextButton.icon(
-      onPressed:()=>showTideActions(context,actions,title:title),
-      icon:const Icon(Icons.more_horiz_rounded),label:const CopyText('Actions')));
+    if(compact)return Align(alignment:Alignment.centerRight,child:IconButton.filledTonal(tooltip:'Actions',onPressed:()=>showTideActions(context,actions,title:title),icon:const Icon(Icons.more_horiz_rounded)));
     return TideSurface(padding:const EdgeInsets.all(8),child:Row(children:[
       if(primary!=null)Expanded(child:FilledButton.icon(
         onPressed:primary.onTap,icon:Icon(primary.icon,size:20),
