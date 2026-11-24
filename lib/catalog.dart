@@ -55,6 +55,6 @@ bool visible(Module m,Api a){
  if(!a.approved)return false;
  if(m.key=='sales')return a.me['canViewSales']==true;
  if(a.me['workspace']==null)return false;
- if(m.key=='dispatches'&&a.me['hasAssignedTasks']==true)return true;
+ if((m.key=='dispatches'||m.key=='tasks')&&a.me['hasAssignedTasks']==true)return true;
  return m.powers.any(a.powers.contains);
 }
