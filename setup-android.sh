@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")"
-command -v flutter >/dev/null || { echo 'Install Flutter 3.35.7 and Android SDK.' >&2; exit 1; }
+command -v flutter >/dev/null || { echo 'Install Flutter 3.47 or later and Android SDK.' >&2; exit 1; }
 if [[ ! -f android/gradlew || ! -f android/gradle/wrapper/gradle-wrapper.jar ]]; then
   temp=$(mktemp -d); trap 'rm -rf "$temp"' EXIT
   flutter create --platforms=android --org com.techninxa --project-name idcolda_ms "$temp"

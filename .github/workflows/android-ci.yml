@@ -14,12 +14,14 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '25'
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.35.7'
+          flutter-version: '3.47.0'
           cache: true
+      - run: flutter config --jdk-dir="$JAVA_HOME"
+      - run: flutter doctor -v
       - run: bash setup-android.sh --build-debug
       - uses: actions/upload-artifact@v4
         with:

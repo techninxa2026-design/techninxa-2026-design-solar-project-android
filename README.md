@@ -4,7 +4,7 @@ Native Flutter application source for the existing IDCOLDA ASP.NET Core MVC back
 
 ## Windows build
 
-Install Flutter 3.35.7, JDK 17 and Android Studio SDK. Run flutter doctor -v and flutter doctor --android-licenses. From the repository root:
+Install Flutter 3.47 or later, your existing JDK 25 and Android Studio SDK. Run flutter doctor -v and flutter doctor --android-licenses. From the repository root:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup-android.ps1 -BuildDebug
@@ -12,22 +12,9 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup-android.ps1 -Bui
 
 Linux: bash setup-android.sh --build-debug. Setup restores only missing Gradle wrapper files from a temporary Flutter scaffold; it preserves the existing runner and package identity. It resolves dependencies, formats sources, runs static analysis and tests, and builds a debug APK when requested. After success: build/app/outputs/flutter-apk/app-debug.apk. Use flutter run with a connected device. The Flutter package name is idcolda; Android application ID remains com.techninxa.idcolda_ms.
 
-## Java / Gradle compatibility on Windows
+## Java 25 compatibility
 
-The verified CI toolchain is Flutter 3.35.7, JDK 17, Gradle 8.12, AGP 8.9.1 and Kotlin 2.1.0. Java 25 cannot run Gradle 8.12. Do not upgrade the Gradle wrapper alone.
-
-Install JDK 17 if missing:
-
-```powershell
-winget install --id Microsoft.OpenJDK.17 --exact
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup-android.ps1 -ConfigureJdkOnly
-flutter doctor -v
-flutter clean
-flutter pub get
-flutter run
-```
-
-Setup discovers installed JDK 17 or accepts an explicit installation root through -JdkDir. It configures Flutter's user-level JDK setting (affects other Flutter projects), without uninstalling newer Java installations or committing machine-specific paths. Use the -BuildDebug switch for the full analyzer, tests and debug APK pipeline. If a custom Gradle user property overrides the JVM, review that local setting separately.
+The Android toolchain restores the original Flutter 3.47 template: Gradle 9.3.1, AGP 9.1.0 and Kotlin 2.4.0. The Gradle JVM may use Java 25; Android source/target bytecode remains Java 17. The template's legacy DSL/Kotlin flags retain compatibility with existing Flutter plugins. No JDK installation or global Flutter JDK setting is required. CI uses Flutter 3.47.0 and Java 25. The new configuration must pass CI and local builds before release.
 
 ## Architecture
 
