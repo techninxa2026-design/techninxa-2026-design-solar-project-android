@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="idcolda_ms"
+        android:usesCleartextTraffic="false"
+        android:allowBackup="false"
+        android:label="IDCOLDA"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -1,0 +1,3270 @@
+[
+  {
+    "method": "POST",
+    "path": "/auth/login",
+    "group": "auth",
+    "screen": "login",
+    "mode": "raw",
+    "fields": [
+      {
+        "key": "email",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "password",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": true
+  },
+  {
+    "method": "GET",
+    "path": "/auth/me",
+    "group": "auth",
+    "screen": "profile",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/workspace/available",
+    "group": "workspace",
+    "screen": "workspace",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/workspace/select",
+    "group": "workspace",
+    "screen": "workspace",
+    "mode": "raw",
+    "fields": [
+      {
+        "key": "companyId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/auth/refresh",
+    "group": "auth",
+    "screen": "sessionInfo",
+    "mode": "raw",
+    "fields": [
+      {
+        "key": "refreshToken",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": true
+  },
+  {
+    "method": "GET",
+    "path": "/dashboard",
+    "group": "dashboard",
+    "screen": "daHome",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/profile",
+    "group": "profile",
+    "screen": "profile",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/profile/photo/{side}",
+    "group": "profile",
+    "screen": "privatePhoto",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "side",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/companies/{id}/logo",
+    "group": "companies",
+    "screen": "companyDetail",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/companies",
+    "group": "companies",
+    "screen": "companies",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "power",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/companies/{id}",
+    "group": "companies",
+    "screen": "companyDetail",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/organization",
+    "group": "organization",
+    "screen": "organization",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "power",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/organization/members/{id}",
+    "group": "organization",
+    "screen": "teamDetail",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/organization/territory-delete-preview",
+    "group": "organization",
+    "screen": "territoryDelete",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "kind",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "zoneId",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/departments",
+    "group": "departments",
+    "screen": "departments",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "power",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/departments/members",
+    "group": "departments",
+    "screen": "departmentMembers",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/departments/applications",
+    "group": "departments",
+    "screen": "applications",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/departments/initial-accounts/{id}/handoff",
+    "group": "departments",
+    "screen": "initialHandoff",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/departments/applications/{id}/confirmation",
+    "group": "departments",
+    "screen": "applicationConfirmation",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/departments/applications/{id}/handoff",
+    "group": "departments",
+    "screen": "whatsapp",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/hierarchy",
+    "group": "hierarchy",
+    "screen": "hierarchy",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/inventory",
+    "group": "inventory",
+    "screen": "inventory",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "power",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/inventory/products/{id}/image",
+    "group": "inventory",
+    "screen": "productImage",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/inventory/products/import-template",
+    "group": "inventory",
+    "screen": "productImport",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/packages",
+    "group": "packages",
+    "screen": "packages",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "power",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/clients",
+    "group": "clients",
+    "screen": "clients",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/clients/{id}",
+    "group": "clients",
+    "screen": "clientDetail",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/tasks",
+    "group": "tasks",
+    "screen": "tasks",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "power",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/tasks/{id}",
+    "group": "tasks",
+    "screen": "taskDetail",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      },
+      {
+        "key": "power",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/dispatches",
+    "group": "dispatches",
+    "screen": "dispatch",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "tab",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/dispatches/{id}",
+    "group": "dispatches",
+    "screen": "accepted",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/sales",
+    "group": "sales",
+    "screen": "sales",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/sales/{id}",
+    "group": "sales",
+    "screen": "saleDetail",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/sales/summary",
+    "group": "sales",
+    "screen": "sales",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/notifications",
+    "group": "notifications",
+    "screen": "notifications",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/notifications/feed",
+    "group": "notifications",
+    "screen": "notifications",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "GET",
+    "path": "/public/companies/{slug}",
+    "group": "public",
+    "screen": "companyPortal",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "slug",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": true
+  },
+  {
+    "method": "GET",
+    "path": "/public/companies/{slug}/email-available",
+    "group": "public",
+    "screen": "applicationForm",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "slug",
+        "required": true,
+        "kind": "path"
+      },
+      {
+        "key": "email",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": true
+  },
+  {
+    "method": "GET",
+    "path": "/public/companies/{slug}/applications",
+    "group": "public",
+    "screen": "applicationForm",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "slug",
+        "required": true,
+        "kind": "path"
+      },
+      {
+        "key": "invite",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": true
+  },
+  {
+    "method": "POST",
+    "path": "/auth/logout",
+    "group": "auth",
+    "screen": "login",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/auth/logout-all",
+    "group": "auth",
+    "screen": "logoutAll",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/clients",
+    "group": "clients",
+    "screen": "clientCreate",
+    "mode": "raw",
+    "fields": [
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "mobile",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "address",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "productInterest",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "gpsLocationUrl",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "PUT",
+    "path": "/clients/{id}",
+    "group": "clients",
+    "screen": "clientCreate",
+    "mode": "raw",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "mobile",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "address",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "productInterest",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "gpsLocationUrl",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "DELETE",
+    "path": "/clients/{id}",
+    "group": "clients",
+    "screen": "clientArchive",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/clients/{id}/restore",
+    "group": "clients",
+    "screen": "clientArchive",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/notifications/{id}/read",
+    "group": "notifications",
+    "screen": "notificationDetail",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/notifications/{id}/open",
+    "group": "notifications",
+    "screen": "notificationDetail",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/notifications/read-all",
+    "group": "notifications",
+    "screen": "notifications",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/notifications/clear-read",
+    "group": "notifications",
+    "screen": "clearNotifications",
+    "mode": "none",
+    "fields": [],
+    "public": false
+  },
+  {
+    "method": "DELETE",
+    "path": "/notifications/{id}",
+    "group": "notifications",
+    "screen": "deleteNotification",
+    "mode": "none",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "path"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/public/register",
+    "group": "public",
+    "screen": "register",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "FullName",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Email",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Password",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "ConfirmPassword",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": true
+  },
+  {
+    "method": "POST",
+    "path": "/public/companies/{slug}/register",
+    "group": "public",
+    "screen": "brandedRegister",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "slug",
+        "required": true,
+        "kind": "path"
+      },
+      {
+        "key": "FullName",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Email",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Password",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "ConfirmPassword",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": true
+  },
+  {
+    "method": "POST",
+    "path": "/public/companies/{slug}/applications",
+    "group": "public",
+    "screen": "applicationForm",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "slug",
+        "required": true,
+        "kind": "path"
+      },
+      {
+        "key": "Email",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "RequestedRoleCode",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "WhatsApp",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Password",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "ReferrerNames",
+        "required": false,
+        "kind": "multi"
+      },
+      {
+        "key": "Invite",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": true
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/create",
+    "group": "departments",
+    "screen": "departmentEdit",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "Name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Track",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "ZoneId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "DistrictId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "AreaId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "BranchId",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/rename",
+    "group": "departments",
+    "screen": "op_departments_rename",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/delete",
+    "group": "departments",
+    "screen": "op_departments_delete",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/assign-member",
+    "group": "departments",
+    "screen": "departmentAssign",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "departmentId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "userId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/update-member-department",
+    "group": "departments",
+    "screen": "op_departments_update_member_department",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "departmentId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/remove-member",
+    "group": "departments",
+    "screen": "op_departments_remove_member",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/route-request",
+    "group": "departments",
+    "screen": "op_departments_route_request",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "departmentId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/create-initial",
+    "group": "departments",
+    "screen": "initialAccount",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "Email",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Password",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "WhatsApp",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/mark-initial-shared",
+    "group": "departments",
+    "screen": "initialHandoff",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/review",
+    "group": "departments",
+    "screen": "applicationReview",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "approve",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/mark-shared",
+    "group": "departments",
+    "screen": "applicationConfirmation",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/departments/retry-delivery",
+    "group": "departments",
+    "screen": "op_departments_retry_delivery",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/create-role",
+    "group": "organization",
+    "screen": "roleEdit",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "kind",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "description",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/create-role-user",
+    "group": "organization",
+    "screen": "roleUserCreate",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "FullName",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Email",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Password",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "RoleCode",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "zoneId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "areaId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "branchId",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/assign-role",
+    "group": "organization",
+    "screen": "assignRole",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "userId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "roleCode",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "zoneId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "areaId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "branchId",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/add-scope",
+    "group": "organization",
+    "screen": "op_organization_add_scope",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "memberId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "zoneId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "areaId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "branchId",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/update-scope",
+    "group": "organization",
+    "screen": "op_organization_update_scope",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "zoneId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "areaId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "branchId",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/remove-scope",
+    "group": "organization",
+    "screen": "op_organization_remove_scope",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/grant-power",
+    "group": "organization",
+    "screen": "grant",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "userId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "powerCodes",
+        "required": true,
+        "kind": "multi"
+      },
+      {
+        "key": "zoneId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "areaId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "branchId",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/update-power-grant",
+    "group": "organization",
+    "screen": "op_organization_update_power_grant",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "powerCode",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "zoneId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "areaId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "branchId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "confirmCompanyWide",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/delete-power-grant",
+    "group": "organization",
+    "screen": "op_organization_delete_power_grant",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/revoke-power",
+    "group": "organization",
+    "screen": "op_organization_revoke_power",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/create-zone",
+    "group": "organization",
+    "screen": "zoneEdit",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "code",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/assign-district",
+    "group": "organization",
+    "screen": "districtEdit",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "zoneId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/create-area",
+    "group": "organization",
+    "screen": "thanaEdit",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "zoneId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/create-branch",
+    "group": "organization",
+    "screen": "branchEdit",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "zoneId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "areaId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "address",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/update-role",
+    "group": "organization",
+    "screen": "op_organization_update_role",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "description",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/delete-role",
+    "group": "organization",
+    "screen": "op_organization_delete_role",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/update-zone",
+    "group": "organization",
+    "screen": "op_organization_update_zone",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "code",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/delete-zone",
+    "group": "organization",
+    "screen": "op_organization_delete_zone",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "confirmation",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/unlink-district",
+    "group": "organization",
+    "screen": "op_organization_unlink_district",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "zoneId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "confirmation",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/relink-thana-zone",
+    "group": "organization",
+    "screen": "op_organization_relink_thana_zone",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "zoneId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/relink-branch-zone",
+    "group": "organization",
+    "screen": "op_organization_relink_branch_zone",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "zoneId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/rename-area",
+    "group": "organization",
+    "screen": "op_organization_rename_area",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/delete-area",
+    "group": "organization",
+    "screen": "op_organization_delete_area",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "confirmation",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/change-branch-thana",
+    "group": "organization",
+    "screen": "op_organization_change_branch_thana",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "areaId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/update-branch",
+    "group": "organization",
+    "screen": "op_organization_update_branch",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "address",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/delete-branch",
+    "group": "organization",
+    "screen": "op_organization_delete_branch",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "confirmation",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/update-member",
+    "group": "organization",
+    "screen": "op_organization_update_member",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "userId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "fullName",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "whatsApp",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/organization/delete-member",
+    "group": "organization",
+    "screen": "op_organization_delete_member",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "userId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/hierarchy/create-position",
+    "group": "hierarchy",
+    "screen": "positionCreate",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "roleCode",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "departmentId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "parentPositionId",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/hierarchy/move-position",
+    "group": "hierarchy",
+    "screen": "moveConfirm",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "parentId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "departmentId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "expectedUpdatedUtc",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/hierarchy/assign-person",
+    "group": "hierarchy",
+    "screen": "op_hierarchy_assign_person",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "userId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "expectedUpdatedUtc",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/hierarchy/change-position-role",
+    "group": "hierarchy",
+    "screen": "op_hierarchy_change_position_role",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "roleCode",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "expectedUpdatedUtc",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/hierarchy/update-position",
+    "group": "hierarchy",
+    "screen": "positionEdit",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "roleCode",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "userId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "parentId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "departmentId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "expectedUpdatedUtc",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/hierarchy/delete-position",
+    "group": "hierarchy",
+    "screen": "op_hierarchy_delete_position",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "expectedUpdatedUtc",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/hierarchy/move-department",
+    "group": "hierarchy",
+    "screen": "op_hierarchy_move_department",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "parentId",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/companies/create",
+    "group": "companies",
+    "screen": "companyCreate",
+    "mode": "formdata",
+    "fields": [
+      {
+        "key": "CompanyKind",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Slug",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Description",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "ContactEmail",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Phone",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Address",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Website",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "PrimaryColor",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "AccentColor",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Logo",
+        "required": false,
+        "kind": "file"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/companies/edit",
+    "group": "companies",
+    "screen": "companyEdit",
+    "mode": "formdata",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Description",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "ContactEmail",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Phone",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Address",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Website",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "PrimaryColor",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "AccentColor",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Logo",
+        "required": false,
+        "kind": "file"
+      },
+      {
+        "key": "CompanyKind",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/companies/set-active",
+    "group": "companies",
+    "screen": "op_companies_set_active",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "active",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/companies/delete",
+    "group": "companies",
+    "screen": "op_companies_delete",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/companies/attach-member",
+    "group": "companies",
+    "screen": "attachMember",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "email",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/companies/review-member",
+    "group": "companies",
+    "screen": "memberReview",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "memberId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "approve",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/companies/revoke-member",
+    "group": "companies",
+    "screen": "op_companies_revoke_member",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "memberId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/companies/delete-member-link",
+    "group": "companies",
+    "screen": "op_companies_delete_member_link",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "memberId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/companies/set-company-admin",
+    "group": "companies",
+    "screen": "op_companies_set_company_admin",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "memberId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/relink-warehouse-zone",
+    "group": "inventory",
+    "screen": "op_inventory_relink_warehouse_zone",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "zoneId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/create-product",
+    "group": "inventory",
+    "screen": "productEdit",
+    "mode": "formdata",
+    "fields": [
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "sku",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "category",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "unit",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "unitPrice",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "image",
+        "required": false,
+        "kind": "file"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/create-warehouse",
+    "group": "inventory",
+    "screen": "warehouseEdit",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "zoneId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "districtId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "areaId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "branchId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "address",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/assign-product",
+    "group": "inventory",
+    "screen": "stockAssign",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "warehouseId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "productId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/adjust-stock",
+    "group": "inventory",
+    "screen": "stockAdjust",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "inventoryId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "delta",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "reason",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/update-product",
+    "group": "inventory",
+    "screen": "op_inventory_update_product",
+    "mode": "formdata",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "sku",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "category",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "unit",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "unitPrice",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "image",
+        "required": false,
+        "kind": "file"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/delete-product-image",
+    "group": "inventory",
+    "screen": "op_inventory_delete_product_image",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/import-products",
+    "group": "inventory",
+    "screen": "productImport",
+    "mode": "formdata",
+    "fields": [
+      {
+        "key": "file",
+        "required": true,
+        "kind": "file"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/delete-product",
+    "group": "inventory",
+    "screen": "op_inventory_delete_product",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/update-warehouse",
+    "group": "inventory",
+    "screen": "op_inventory_update_warehouse",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "address",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/delete-warehouse",
+    "group": "inventory",
+    "screen": "op_inventory_delete_warehouse",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/inventory/unassign-product",
+    "group": "inventory",
+    "screen": "op_inventory_unassign_product",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/packages/create-parameter",
+    "group": "packages",
+    "screen": "parameterEdit",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "kind",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "value",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/packages/update-parameter",
+    "group": "packages",
+    "screen": "op_packages_update_parameter",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "value",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/packages/delete-parameter",
+    "group": "packages",
+    "screen": "op_packages_delete_parameter",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/packages/create-product",
+    "group": "packages",
+    "screen": "packageProductEdit",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "Name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Unit",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "UnitPrice",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "InitialQuantity",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "WarehouseId",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/packages/update-product",
+    "group": "packages",
+    "screen": "op_packages_update_product",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "name",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "unit",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "unitPrice",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/packages/delete-product",
+    "group": "packages",
+    "screen": "op_packages_delete_product",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/packages/create-package",
+    "group": "packages",
+    "screen": "packageBuild",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "PackageNameId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "BessId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "InverterId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Notes",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Items",
+        "required": true,
+        "kind": "items"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/packages/update-package",
+    "group": "packages",
+    "screen": "op_packages_update_package",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "PackageNameId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "BessId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "InverterId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Notes",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Items",
+        "required": true,
+        "kind": "items"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/packages/delete-package",
+    "group": "packages",
+    "screen": "op_packages_delete_package",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/tasks/create",
+    "group": "tasks",
+    "screen": "taskCreate",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "title",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "taskType",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "description",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "clientId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "packageId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "packageProducts",
+        "required": false,
+        "kind": "items"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/tasks/assign",
+    "group": "tasks",
+    "screen": "assignParticipant",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "userId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "kind",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/tasks/remove-assignment",
+    "group": "tasks",
+    "screen": "op_tasks_remove_assignment",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "assignmentId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/tasks/change-assignment",
+    "group": "tasks",
+    "screen": "op_tasks_change_assignment",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "assignmentId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "kind",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/tasks/report",
+    "group": "tasks",
+    "screen": "taskReport",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "report",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/tasks/status",
+    "group": "tasks",
+    "screen": "taskStatus",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "status",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/tasks/update",
+    "group": "tasks",
+    "screen": "op_tasks_update",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "title",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "taskType",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "description",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "clientId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "packageId",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "packageProducts",
+        "required": false,
+        "kind": "items"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/tasks/delete",
+    "group": "tasks",
+    "screen": "op_tasks_delete",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/tasks/update-report",
+    "group": "tasks",
+    "screen": "op_tasks_update_report",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "reportId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "report",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/tasks/delete-report",
+    "group": "tasks",
+    "screen": "op_tasks_delete_report",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "reportId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/dispatches/assign",
+    "group": "dispatches",
+    "screen": "assignInstaller",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "taskId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "installerCompanyId",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "daOfferedInstallationDate",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/dispatches/respond",
+    "group": "dispatches",
+    "screen": "incoming",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "decision",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "note",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/dispatches/report",
+    "group": "dispatches",
+    "screen": "op_dispatches_report",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "body",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/dispatches/progress",
+    "group": "dispatches",
+    "screen": "progress",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "progress",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "note",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/dispatches/schedule",
+    "group": "dispatches",
+    "screen": "schedule",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "scheduledInstallationDate",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "note",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/dispatches/retry-sms",
+    "group": "dispatches",
+    "screen": "op_dispatches_retry_sms",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/dispatches/verify-completion-otp",
+    "group": "dispatches",
+    "screen": "otp",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "code",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/dispatches/assign-worker",
+    "group": "dispatches",
+    "screen": "workerAssign",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "userId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/dispatches/remove-worker",
+    "group": "dispatches",
+    "screen": "op_dispatches_remove_worker",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "id",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "workerId",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/profile/save",
+    "group": "profile",
+    "screen": "profileEdit",
+    "mode": "formdata",
+    "fields": [
+      {
+        "key": "Form.FullName",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "Form.WhatsApp",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Form.NidFront",
+        "required": false,
+        "kind": "file"
+      },
+      {
+        "key": "Form.NidBack",
+        "required": false,
+        "kind": "file"
+      },
+      {
+        "key": "Form.RemoveFront",
+        "required": false,
+        "kind": "text"
+      },
+      {
+        "key": "Form.RemoveBack",
+        "required": false,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  },
+  {
+    "method": "POST",
+    "path": "/commands/profile/change-password",
+    "group": "profile",
+    "screen": "password",
+    "mode": "urlencoded",
+    "fields": [
+      {
+        "key": "currentPassword",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "newPassword",
+        "required": true,
+        "kind": "text"
+      },
+      {
+        "key": "confirmPassword",
+        "required": true,
+        "kind": "text"
+      }
+    ],
+    "public": false
+  }
+]
