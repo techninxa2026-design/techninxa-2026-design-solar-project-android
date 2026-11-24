@@ -98,22 +98,22 @@ class TideMetric extends StatelessWidget {
   final IconData icon;
   final String? supporting;
   final VoidCallback? onTap;
-  const TideMetric({super.key,required this.label,required this.value,
-    required this.icon,this.supporting,this.onTap});
-  @override
-  Widget build(BuildContext context) {
-    final t=Theme.of(context);
-    return TideSurface(tinted:true,onTap:onTap,child:Column(
-      crossAxisAlignment:CrossAxisAlignment.start,children:[
-        Row(children:[TideGlyph(icon,size:42),const Spacer(),if(onTap!=null)Icon(Icons.arrow_outward,size:19,color:t.colorScheme.primary)]),
-        const SizedBox(height:15),
-        CopyText(value,style:t.textTheme.headlineLarge?.copyWith(
-          color:t.colorScheme.primary,fontWeight:FontWeight.w900,letterSpacing:-1)),
-        const SizedBox(height:5),
-        CopyText(label,style:t.textTheme.titleSmall),
-        if(supporting!=null)...[const SizedBox(height:8),
-          CopyText(supporting!,style:t.textTheme.bodySmall)],
-      ]));
+  const TideMetric({super.key,required this.label,required this.value,required this.icon,this.supporting,this.onTap});
+  @override Widget build(BuildContext context) {
+    final t=Theme.of(context);final s=t.colorScheme;
+    final financial=icon==Icons.insights_outlined||icon==Icons.payments_outlined;
+    return TideSurface(padding:EdgeInsets.zero,onTap:onTap,child:Stack(children:[
+      Positioned(right:-20,top:-18,child:Icon(icon,size:105,color:s.primary.withValues(alpha:.07))),
+      Padding(padding:const EdgeInsets.all(17),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+        Row(children:[TideGlyph(icon,size:40),const Spacer(),if(onTap!=null)Icon(Icons.arrow_outward_rounded,size:19,color:s.primary)]),
+        const SizedBox(height:14),
+        CopyText(label,style:t.textTheme.labelMedium?.copyWith(color:s.onSurfaceVariant)),
+        const SizedBox(height:6),
+        CopyText(value,style:t.textTheme.headlineLarge?.copyWith(color:s.primary,fontWeight:FontWeight.w900,letterSpacing:-1.2,fontSize:financial?34:32)),
+        if(supporting!=null)...[const SizedBox(height:13),Divider(height:1,color:s.outline.withValues(alpha:.45)),const SizedBox(height:10),
+          CopyText(supporting!,style:t.textTheme.titleSmall?.copyWith(color:s.primary))],
+      ])),
+    ]));
   }
 }
 
@@ -122,24 +122,25 @@ class TideModuleTile extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final bool compact;
-  const TideModuleTile({super.key,required this.title,required this.subtitle,
-    required this.icon,required this.onTap,this.compact=false});
-  @override
-  Widget build(BuildContext context) {
-    final t=Theme.of(context);
+  const TideModuleTile({super.key,required this.title,required this.subtitle,required this.icon,required this.onTap,this.compact=false});
+  @override Widget build(BuildContext context) {
+    final t=Theme.of(context);final s=t.colorScheme;
     final content=Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-      CopyText(title,style:t.textTheme.titleMedium),
-      const SizedBox(height:4),
-      CopyText(subtitle,style:t.textTheme.bodySmall),
+      CopyText(title,style:t.textTheme.titleMedium?.copyWith(height:1.23)),
+      const SizedBox(height:5),CopyText(subtitle,style:t.textTheme.bodySmall),
     ]);
-    return TideSurface(onTap:onTap,child:compact?Row(children:[
-      TideGlyph(icon,size:46),const SizedBox(width:13),Expanded(child:content),
-      const SizedBox(width:8),Icon(Icons.arrow_forward_ios_rounded,size:14,color:t.colorScheme.primary),
-    ]):Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-      Row(children:[TideGlyph(icon),const Spacer(),
-        Icon(Icons.arrow_outward,size:18,color:t.colorScheme.primary)]),
-      const SizedBox(height:15),content,
-    ]));
+    return TideSurface(onTap:onTap,padding:EdgeInsets.zero,child:compact?
+      Padding(padding:const EdgeInsets.all(15),child:Row(children:[
+        TideGlyph(icon,size:46),const SizedBox(width:13),Expanded(child:content),const SizedBox(width:8),
+        Icon(Icons.arrow_outward_rounded,size:19,color:s.primary),
+      ])):
+      Stack(children:[
+        Positioned(right:-25,bottom:-24,child:Icon(icon,size:100,color:s.primary.withValues(alpha:.055))),
+        Padding(padding:const EdgeInsets.all(16),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+          Row(children:[TideGlyph(icon,size:46),const Spacer(),Icon(Icons.arrow_outward_rounded,size:18,color:s.primary)]),
+          const SizedBox(height:20),content,
+        ])),
+      ]));
   }
 }
 

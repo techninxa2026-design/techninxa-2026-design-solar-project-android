@@ -141,8 +141,8 @@ Future<void> showTideActions(BuildContext context,List<TideAction> actions,{Stri
       Widget tile(TideAction action)=>TideSurface(
         onTap:()=>Navigator.pop(c,action),padding:const EdgeInsets.all(13),
         child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-          Icon(action.icon,size:25,color:action.destructive?t.colorScheme.error:t.colorScheme.primary),
-          const SizedBox(height:10),
+          Container(width:44,height:44,decoration:BoxDecoration(color:tideTint(c,action.destructive?t.colorScheme.error:t.colorScheme.primary,.12),borderRadius:BorderRadius.circular(14)),child:Icon(action.icon,size:23,color:action.destructive?t.colorScheme.error:t.colorScheme.primary)),
+          const SizedBox(height:13),
           CopyText(action.title,style:t.textTheme.titleSmall?.copyWith(
             color:action.destructive?t.colorScheme.error:null)),
         ]),
