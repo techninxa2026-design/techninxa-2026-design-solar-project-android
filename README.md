@@ -12,6 +12,23 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup-android.ps1 -Bui
 
 Linux: bash setup-android.sh --build-debug. Setup restores only missing Gradle wrapper files from a temporary Flutter scaffold; it preserves the existing runner and package identity. It resolves dependencies, formats sources, runs static analysis and tests, and builds a debug APK when requested. After success: build/app/outputs/flutter-apk/app-debug.apk. Use flutter run with a connected device. The Flutter package name is idcolda; Android application ID remains com.techninxa.idcolda_ms.
 
+## Java / Gradle compatibility on Windows
+
+The verified CI toolchain is Flutter 3.35.7, JDK 17, Gradle 8.12, AGP 8.9.1 and Kotlin 2.1.0. Java 25 cannot run Gradle 8.12. Do not upgrade the Gradle wrapper alone.
+
+Install JDK 17 if missing:
+
+```powershell
+winget install --id Microsoft.OpenJDK.17 --exact
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup-android.ps1 -ConfigureJdkOnly
+flutter doctor -v
+flutter clean
+flutter pub get
+flutter run
+```
+
+Setup discovers installed JDK 17 or accepts an explicit installation root through -JdkDir. It configures Flutter's user-level JDK setting (affects other Flutter projects), without uninstalling newer Java installations or committing machine-specific paths. Use the -BuildDebug switch for the full analyzer, tests and debug APK pipeline. If a custom Gradle user property overrides the JVM, review that local setting separately.
+
 ## Architecture
 
 - lib/api.dart: HTTPS transport, rotating JWT sessions, secure storage, workspace tickets, JSON/form/multipart requests; no automatic write replay.
