@@ -1,0 +1,1 @@
+# techninxa-2026-design-solar-project-android
