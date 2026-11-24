@@ -38,7 +38,7 @@ void main(){
    const TideChoiceList(values:{'1':'A long organization name with multiple words','2':'Another option'},selected:{'1'},multiple:true),
    TideSegments<String>(segments:const [ButtonSegment(value:'a',label:Text('Awaiting approval')),ButtonSegment(value:'b',label:Text('Completed')),ButtonSegment(value:'c',label:Text('Rejected'))],selected:const {'a'},onSelectionChanged:(_){}),
    const TideMapLink(address:'A long customer location with a full street address'),
-  ])))))));
+  ]))))));
   await tester.pumpAndSettle();
   expect(tester.takeException(),isNull);
  });
