@@ -48,6 +48,7 @@ void main(){
   await tester.pumpAndSettle();
   expect(find.text('Area Manager'),findsWidgets);
   expect(find.byType(LongPressDraggable<HierarchyDrag>),findsWidgets);
+  expect(find.text('Reports to'),findsWidgets);
   await tester.tap(find.byTooltip('Visual editor'));await tester.pumpAndSettle();
   expect(find.byType(InteractiveViewer),findsOneWidget);
   expect(tester.takeException(),isNull);

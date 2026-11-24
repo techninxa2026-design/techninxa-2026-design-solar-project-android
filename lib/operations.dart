@@ -61,8 +61,8 @@ class BusinessRecordCard extends StatelessWidget {
   final String module,section;
   final Map<String,dynamic> data;
   final VoidCallback? onTap;
-  final Widget? media;
-  const BusinessRecordCard({super.key,required this.module,required this.section,required this.data,this.onTap,this.media});
+  final Widget? media,footer;
+  const BusinessRecordCard({super.key,required this.module,required this.section,required this.data,this.onTap,this.media,this.footer});
   String? value(String k){final x=data[k];return x==null||x.toString().trim().isEmpty?null:prettyValue(k,x);}
   @override Widget build(BuildContext c){
     final t=Theme.of(c);final s=t.colorScheme;
@@ -113,6 +113,7 @@ class BusinessRecordCard extends StatelessWidget {
       final columns=bounds.maxWidth>=350&&MediaQuery.textScalerOf(c).scale(14)<=17?2:1;
       return Wrap(spacing:12,runSpacing:14,children:ks.map((k)=>SizedBox(width:tideAddressKey(k)?bounds.maxWidth:(bounds.maxWidth-(columns-1)*12)/columns,child:fact(k))).toList());
     });
+    List<Widget> footerWidgets()=>[if(footer!=null)...[const SizedBox(height:12),const Divider(height:1),footer!]];
     if(finance&&metric!=null){
       return TideSurface(onTap:onTap,padding:EdgeInsets.zero,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
         Container(padding:const EdgeInsets.all(18),decoration:BoxDecoration(gradient:LinearGradient(colors:[contrast(s.primary),contrast(const Color(0xff087eb1))])),child:Stack(children:[
@@ -124,7 +125,7 @@ class BusinessRecordCard extends StatelessWidget {
         ])),
         Padding(padding:const EdgeInsets.all(15),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
           CopyText(title,style:t.textTheme.titleMedium),if(status!=null)...[const SizedBox(height:7),TideStatus(status)],
-          if(rest.isNotEmpty)...[const SizedBox(height:13),factsGrid(rest)],
+          if(rest.isNotEmpty)...[const SizedBox(height:13),factsGrid(rest)],...footerWidgets(),
         ])),
       ]));
     }
@@ -134,26 +135,26 @@ class BusinessRecordCard extends StatelessWidget {
         Expanded(child:Padding(padding:const EdgeInsets.all(15),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
           header(),
           if(dateText!=null)...[const SizedBox(height:14),Container(padding:const EdgeInsets.all(12),decoration:BoxDecoration(color:tideTint(c,s.primary,.10),borderRadius:BorderRadius.circular(16)),child:fact(date!))],
-          if(rest.any((k)=>k!=date))...[const SizedBox(height:14),factsGrid(rest.where((k)=>k!=date).toList())],
+          if(rest.any((k)=>k!=date))...[const SizedBox(height:14),factsGrid(rest.where((k)=>k!=date).toList())],...footerWidgets(),
         ]))),
       ]));
     }
     if(person){
       return TideSurface(onTap:onTap,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
         header(circle:true),
-        if(rest.isNotEmpty)...[const SizedBox(height:14),factsGrid(rest)],
+        if(rest.isNotEmpty)...[const SizedBox(height:14),factsGrid(rest)],...footerWidgets(),
       ]));
     }
     if(module=='notifications'){
       return TideSurface(onTap:onTap,tinted:data['isRead']==false,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
         header(),
-        for(final k in rest)...[const SizedBox(height:9),if(k=='message'||k=='body')CopyText(value(k)!,style:t.textTheme.bodyMedium)else fact(k)],
+        for(final k in rest)...[const SizedBox(height:9),if(k=='message'||k=='body')CopyText(value(k)!,style:t.textTheme.bodyMedium)else fact(k)],...footerWidgets(),
       ]));
     }
     return TideSurface(onTap:onTap,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
       header(),
       if(metric!=null)...[const SizedBox(height:13),Container(width:double.infinity,padding:const EdgeInsets.all(13),decoration:BoxDecoration(color:tideTint(c,s.primary,.09),borderRadius:BorderRadius.circular(16)),child:TideFact(label:label(metric),value:value(metric)!,emphasis:true))],
-      if(rest.isNotEmpty)...[const SizedBox(height:14),factsGrid(rest)],
+      if(rest.isNotEmpty)...[const SizedBox(height:14),factsGrid(rest)],...footerWidgets(),
     ]));
   }
 }
@@ -284,8 +285,7 @@ class _RecordPageState extends State<RecordPage>{late Future<Map<String,dynamic>
   out.add(TideTimelineEntry(title:heading(x),description:(x['report']??x['body'])?.toString(),stamp:x['createdUtc']==null?null:prettyValue('createdUtc',x['createdUtc']),last:identical(x,items.last),actions:dock));
  }else{
   out.add(Padding(padding:const EdgeInsets.only(bottom:10),child:Column(children:[
-    BusinessRecordCard(module:name=='Company members'||name=='Field team'||name=='Participants and monitors'?'people':name=='Package products'?'products':key,section:'items',data:displayRecord(x,{...merged(widget.source,d),'navigation':a.me['navigation']})),
-    if(dock!=null)dock,
+    BusinessRecordCard(module:name=='Company members'||name=='Field team'||name=='Participants and monitors'?'people':name=='Package products'?'products':key,section:'items',data:displayRecord(x,{...merged(widget.source,d),'navigation':a.me['navigation']}),footer:dock),
   ])));
  }
 }}
