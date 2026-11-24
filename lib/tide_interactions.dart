@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'copy.dart';
+import 'feedback.dart';
 import 'theme.dart';
 import 'tide_cards.dart';
 import 'tide_editorial.dart';
@@ -120,7 +121,7 @@ class TideMapLink extends StatelessWidget{
  final s=Theme.of(c).colorScheme;final hasPin=tideMapUri(gps:gps)!=null;
  return Material(color:tideTint(c,s.primary,.08),borderRadius:BorderRadius.circular(16),child:InkWell(borderRadius:BorderRadius.circular(16),onTap:()async{
  try{if(await launchUrl(uri,mode:LaunchMode.externalApplication))return;}catch(_){}
- if(c.mounted)ScaffoldMessenger.of(c).showSnackBar(const SnackBar(content:CopyText('Unable to open Maps.')));
+ if(c.mounted)showFeedback('Unable to open Maps.',context:c,kind:FeedbackKind.error);
  },child:Padding(padding:const EdgeInsets.all(12),child:Row(crossAxisAlignment:CrossAxisAlignment.start,children:[
  Icon(Icons.location_on_outlined,color:s.primary,size:22),const SizedBox(width:9),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
  if((address??'').trim().isNotEmpty)CopyText(address!,style:Theme.of(c).textTheme.bodyMedium),
