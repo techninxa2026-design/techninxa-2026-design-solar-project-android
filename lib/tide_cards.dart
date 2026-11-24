@@ -63,17 +63,18 @@ class TideSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t=Theme.of(context);
-    return Row(crossAxisAlignment:CrossAxisAlignment.center,children:[
-      Container(width:4,height:32,decoration:BoxDecoration(
-        color:t.colorScheme.primary,borderRadius:BorderRadius.circular(6))),
-      const SizedBox(width:10),
-      Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+    final heading=Row(crossAxisAlignment:CrossAxisAlignment.center,children:[
+      Container(width:4,height:32,decoration:BoxDecoration(color:t.colorScheme.primary,borderRadius:BorderRadius.circular(6))),
+      const SizedBox(width:10),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
         CopyText(title,style:t.textTheme.titleLarge),
-        if(subtitle!=null) ...[const SizedBox(height:3),
-          CopyText(subtitle!,style:t.textTheme.bodySmall)],
+        if(subtitle!=null)...[const SizedBox(height:3),CopyText(subtitle!,style:t.textTheme.bodySmall)],
       ])),
-      if(trailing!=null)...[const SizedBox(width:8),trailing!],
     ]);
+    return LayoutBuilder(builder:(c,box){
+      if(trailing==null)return heading;
+      if(box.maxWidth<360||MediaQuery.textScalerOf(c).scale(16)>19)return Column(crossAxisAlignment:CrossAxisAlignment.start,children:[heading,Align(alignment:Alignment.centerRight,child:trailing!)]);
+      return Row(children:[Expanded(child:heading),const SizedBox(width:8),trailing!]);
+    });
   }
 }
 
@@ -85,7 +86,7 @@ class TideGrid extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(builder:(context,bounds){
     final scale=MediaQuery.textScalerOf(context).scale(16)/16;
     final width=bounds.maxWidth;
-    final columns=width<335||scale>1.35?1:width>=720&&maxColumns>=3?3:2;
+    final columns=width>=690*scale&&maxColumns>=3?3:width>=350*scale&&maxColumns>=2?2:1;
     const gap=12.0;
     final cell=(width-(columns-1)*gap)/columns;
     return Wrap(spacing:gap,runSpacing:gap,

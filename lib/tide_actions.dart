@@ -4,6 +4,7 @@ import 'api.dart';
 import 'copy.dart';
 import 'theme.dart';
 import 'tide_cards.dart';
+import 'tide_interactions.dart';
 
 /// Load only known IDCOLDA logo paths using the existing authorized transport.
 /// No arbitrary external URLs, no bearer token in an image URL, no disk cache.
@@ -93,10 +94,7 @@ class CompanyIdentityCard extends StatelessWidget {
             if(data['active'] is bool)TideStatus(data['active']==true?'Active':'Inactive'),
             if(memberCount!=null)CopyText('$memberCount members',style:t.textTheme.labelMedium),
           ]),
-          if(rawAddress.isNotEmpty)...[const SizedBox(height:12),Row(crossAxisAlignment:CrossAxisAlignment.start,children:[
-            Icon(Icons.location_on_outlined,size:17,color:t.colorScheme.primary),
-            const SizedBox(width:7),Expanded(child:CopyText(rawAddress,style:t.textTheme.bodySmall)),
-          ])],
+          if(rawAddress.isNotEmpty)...[const SizedBox(height:12),TideMapLink(address:rawAddress,compact:true)],
         ])),
       ],
     ));
@@ -130,44 +128,32 @@ IconData actionIcon(String path,String method){
 }
 
 Future<void> showTideActions(BuildContext context,List<TideAction> actions,{String title='Actions'})async{
-  if(actions.isEmpty)return;
-  final selected=await showModalBottomSheet<TideAction>(
-    context:context,isScrollControlled:true,showDragHandle:true,useSafeArea:true,
-    shape:const RoundedRectangleBorder(borderRadius:BorderRadius.vertical(top:Radius.circular(30))),
-    builder:(c){
-      final t=Theme.of(c);
-      final normal=actions.where((a)=>!a.destructive).toList();
-      final danger=actions.where((a)=>a.destructive).toList();
-      Widget tile(TideAction action)=>TideSurface(
-        onTap:()=>Navigator.pop(c,action),padding:const EdgeInsets.all(13),
-        child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-          Container(width:44,height:44,decoration:BoxDecoration(color:tideTint(c,action.destructive?t.colorScheme.error:t.colorScheme.primary,.12),borderRadius:BorderRadius.circular(14)),child:Icon(action.icon,size:23,color:action.destructive?t.colorScheme.error:t.colorScheme.primary)),
-          const SizedBox(height:13),
-          CopyText(action.title,style:t.textTheme.titleSmall?.copyWith(
-            color:action.destructive?t.colorScheme.error:null)),
-        ]),
-      );
-      return SafeArea(top:false,child:ConstrainedBox(
-        constraints:BoxConstraints(maxHeight:MediaQuery.sizeOf(c).height*.74),
-        child:SingleChildScrollView(padding:const EdgeInsets.fromLTRB(20,0,20,24),
-          child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-            CopyText(title,style:t.textTheme.headlineSmall),
-            const SizedBox(height:5),
-            CopyText('Choose what you want to do',style:t.textTheme.bodySmall),
-            const SizedBox(height:18),
-            if(normal.isNotEmpty)TideGrid(maxColumns:2,children:normal.map(tile).toList()),
-            if(danger.isNotEmpty)...[
-              if(normal.isNotEmpty)const SizedBox(height:20),
-              CopyText('Manage access or remove',style:t.textTheme.labelLarge?.copyWith(color:t.colorScheme.error)),
-              const SizedBox(height:10),
-              TideGrid(maxColumns:2,children:danger.map(tile).toList()),
-            ],
-          ])),
-      ));
-    });
-  if(selected!=null&&context.mounted)selected.onTap();
+ if(actions.isEmpty)return;
+ final selected=await showTideSheet<TideAction>(context,title:title,subtitle:actions.length.toString()+' available operations',icon:Icons.bolt_rounded,content:(_)=>_TideActionMenu(actions:actions));
+ if(selected!=null&&context.mounted)selected.onTap();
 }
-
+class _TideActionMenu extends StatefulWidget{
+ final List<TideAction> actions;const _TideActionMenu({required this.actions});
+ @override State<_TideActionMenu> createState()=>_TideActionMenuState();
+}
+class _TideActionMenuState extends State<_TideActionMenu>{
+ String query='';
+ @override Widget build(BuildContext c){
+ final t=Theme.of(c);final s=t.colorScheme;
+ final matches=widget.actions.where((a)=>tr(c,a.title).toLowerCase().contains(query.trim().toLowerCase())||a.title.toLowerCase().contains(query.trim().toLowerCase())).toList();
+ final normal=matches.where((a)=>!a.destructive).toList();final danger=matches.where((a)=>a.destructive).toList();
+ Widget tile(TideAction a)=>TideSurface(onTap:()=>Navigator.pop(c,a),padding:const EdgeInsets.all(14),tinted:!a.destructive,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+ Row(children:[Container(width:44,height:44,decoration:BoxDecoration(color:tideTint(c,a.destructive?s.error:s.primary,.15),borderRadius:BorderRadius.circular(15)),child:Icon(a.icon,color:a.destructive?s.error:s.primary,size:23)),const Spacer(),Icon(Icons.arrow_outward_rounded,color:a.destructive?s.error:s.primary,size:17)]),
+ const SizedBox(height:12),CopyText(a.title,style:t.textTheme.titleSmall?.copyWith(color:a.destructive?s.error:null,height:1.25)),
+ ]));
+ return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+ if(widget.actions.length>6)...[TextField(decoration:const InputDecoration(hintText:'Search actions',prefixIcon:Icon(Icons.search_rounded)),onChanged:(v)=>setState(()=>query=v)),const SizedBox(height:14)],
+ if(normal.isNotEmpty)...[const TideSection(title:'Operations'),const SizedBox(height:10),TideGrid(maxColumns:2,children:normal.map(tile).toList())],
+ if(danger.isNotEmpty)...[const SizedBox(height:18),const TideSection(title:'Manage access or remove'),const SizedBox(height:10),TideGrid(maxColumns:2,children:danger.map(tile).toList())],
+ if(matches.isEmpty)const TideEmpty(message:'No matching actions.'),
+ ]);
+ }
+}
 /// At most one direct primary action. The rest are available through an
 /// icon-led, two-column sheet; no new operation is introduced by this widget.
 class TideActionDock extends StatelessWidget {
