@@ -21,11 +21,11 @@ class WorkspaceHeader extends StatelessWidget implements PreferredSizeWidget{
     child:Column(mainAxisSize:MainAxisSize.min,children:[
      SizedBox(height:54,child:Row(children:[
       logo,const SizedBox(width:10),
-      Expanded(child:Column(mainAxisAlignment:MainAxisAlignment.center,crossAxisAlignment:CrossAxisAlignment.start,children:[
+      Expanded(child:LayoutBuilder(builder:(c,bounds)=>FittedBox(fit:BoxFit.scaleDown,alignment:Alignment.centerLeft,child:SizedBox(width:bounds.maxWidth,child:Column(mainAxisSize:MainAxisSize.min,mainAxisAlignment:MainAxisAlignment.center,crossAxisAlignment:CrossAxisAlignment.start,children:[
        CopyText(title,style:const TextStyle(color:Colors.white,fontSize:18,fontWeight:FontWeight.w800,height:1.2),maxLines:1,overflow:TextOverflow.ellipsis),
        const SizedBox(height:3),
        CopyText(subtitle,style:const TextStyle(color:Colors.white,fontSize:11,fontWeight:FontWeight.w500,height:1.2),maxLines:1,overflow:TextOverflow.ellipsis),
-      ])),
+      ]))))),
       const SizedBox(width:4),
       IconButton(tooltip:'Notifications',color:Colors.white,onPressed:onNotifications,icon:Badge(isLabelVisible:unread>0,backgroundColor:Colors.white,textColor:color,label:Text(unread>99?'99+':unread.toString()),child:const Icon(Icons.notifications_rounded,size:24))),
       IconButton(tooltip:'Account',color:Colors.white,onPressed:onAccount,icon:const Icon(Icons.account_circle_rounded,size:27)),

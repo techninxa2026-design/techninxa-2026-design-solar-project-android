@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:idcolda/workspace_chrome.dart';
 import 'package:idcolda/feedback.dart';
+import 'package:idcolda/theme.dart';
 import 'package:idcolda/hierarchy_board.dart';
 
 void main(){
@@ -18,6 +19,20 @@ void main(){
   String? chosen;
   await tester.pumpWidget(MaterialApp(home:Scaffold(appBar:WorkspaceHeader(logo:const Icon(Icons.sunny,size:44),title:'A long company workspace name',subtitle:'Company workspace',unread:4,approved:true,onNotifications:(){},onAccount:(){},onSearch:(){}),body:const SizedBox(),bottomNavigationBar:WorkspaceNavigation(items:const [WorkspaceNavItem('home','Home',Icons.home),WorkspaceNavItem('tasks','Tasks',Icons.task),WorkspaceNavItem('stores','Stores',Icons.store),WorkspaceNavItem('modules','Modules',Icons.apps),WorkspaceNavItem('account','Account',Icons.person)],selected:'home',onSelect:(x)=>chosen=x))));
   await tester.tap(find.byKey(const ValueKey('nav-tasks')));await tester.pumpAndSettle();expect(chosen,'tasks');expect(find.text('Tasks'),findsNothing);expect(find.byTooltip('Tasks'),findsOneWidget);expect(tester.takeException(),isNull);
+ });
+ testWidgets('Reference strip and standard app bars share the branded color and curvature',(tester)async{
+  const brand=Brand();
+  for(final dark in [false,true]){
+   await tester.pumpWidget(MaterialApp(theme:tide(brand,dark),home:Scaffold(appBar:AppBar(title:const Text('Company details')),body:const SizedBox(),bottomNavigationBar:WorkspaceNavigation(items:const [WorkspaceNavItem('home','Home',Icons.home),WorkspaceNavItem('account','Account',Icons.person)],selected:'home',onSelect:(_){}))));
+   await tester.pumpAndSettle();
+   final strip=tester.widget<Material>(find.byKey(const ValueKey('workspace-navigation-strip')));
+   expect(strip.color,brand.deep);
+   expect(strip.borderRadius,workspaceBarShape);
+   final context=tester.element(find.byType(AppBar));
+   expect(Theme.of(context).appBarTheme.backgroundColor,strip.color);
+   expect(Theme.of(context).appBarTheme.foregroundColor,Colors.white);
+   expect(tester.takeException(),isNull);
+  }
  });
  testWidgets('Actual drag handle emits the same move as MVC',(tester)async{
   tester.view.physicalSize=const Size(760,1050);tester.view.devicePixelRatio=1;
