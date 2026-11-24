@@ -184,7 +184,7 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
   data:HierarchyDrag(kind,p),maxSimultaneousDrags:widget.busy?0:1,
   dragAnchorStrategy:pointerDragAnchorStrategy,feedback:feedback(title(kind,p)),
   onDragStarted:beginDrag,onDragUpdate:edgePan,onDragEnd:(_)=>endDrag(),
-  child:const Tooltip(message:'Drag to move',child:SizedBox(width:42,height:42,child:Icon(Icons.drag_indicator_rounded))));
+  child:Tooltip(message:'Drag to move',child:SizedBox(key:ValueKey('drag-$kind-${p['id']??p['code']}'),width:42,height:42,child:const Icon(Icons.drag_indicator_rounded))));
  void select(HierarchyDrag item){setState(()=>picked=item);}
  void applyTarget(String kind,Map<String,dynamic>? p){
   final item=picked;if(item==null)return;
@@ -201,7 +201,7 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
   final sub=kind=='position'?person(p):positions.where((x)=>x['departmentId']==p['id']).length.toString()+' positions';
   final matches=search.isEmpty||[name,sub,if(kind=='position')dept(p)].join(' ').toLowerCase().contains(search);
   return target(kind,p,(highlight){
-   final card=Material(color:highlight?t.colorScheme.primaryContainer:t.colorScheme.surface,borderRadius:BorderRadius.circular(19),child:InkWell(
+   final card=Material(key:ValueKey('node-$kind-${p['id']}'),color:highlight?t.colorScheme.primaryContainer:t.colorScheme.surface,borderRadius:BorderRadius.circular(19),child:InkWell(
     onTap:widget.busy?null:()=>picked!=null?applyTarget(kind,p):widget.onEdit(p,kind),borderRadius:BorderRadius.circular(19),child:Container(
     padding:const EdgeInsets.all(12),decoration:BoxDecoration(border:Border.all(color:highlight?t.colorScheme.primary:t.colorScheme.outline,width:highlight?3:1),borderRadius:BorderRadius.circular(19)),
     child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
@@ -230,12 +230,12 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
   final t=Theme.of(c);
   final keyboard=MediaQuery.viewInsetsOf(c).bottom>0;
   return LayoutBuilder(builder:(c,bounds){
-   if(bounds.maxHeight<180)return const Center(child:CopyText('Close the keyboard to edit the chart.'));
+   if(bounds.maxHeight<180)return const Center(child:CopyText('Use a taller window to edit the chart.'));
    return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-    if(!keyboard)Padding(padding:const EdgeInsets.only(bottom:5),child:CopyText('Drag the grip to move a card, or choose a person and tap a position.',style:t.textTheme.bodySmall)),
+    if(!keyboard)Padding(padding:const EdgeInsets.only(bottom:5),child:CopyText('Drag the grip to move a card. Pinch to zoom.',style:t.textTheme.bodySmall)),
     if(!keyboard)...[
      Row(children:[Expanded(child:CopyText(departments?'Departments':'Positions',style:t.textTheme.titleSmall,maxLines:1,overflow:TextOverflow.ellipsis)),IconButton(tooltip:'Zoom out',onPressed:()=>zoom(-.15),icon:const Icon(Icons.remove)),IconButton(tooltip:'Fit chart',onPressed:()=>fit(graph),icon:const Icon(Icons.fit_screen_outlined)),IconButton(tooltip:'Zoom in',onPressed:()=>zoom(.15),icon:const Icon(Icons.add))]),
-     target('root-'+kind,null,(highlight)=>InkWell(onTap:widget.busy?null:()=>applyTarget('root-'+kind,null),borderRadius:BorderRadius.circular(17),child:AnimatedContainer(duration:const Duration(milliseconds:120),padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:highlight?t.colorScheme.primaryContainer:t.colorScheme.surface,border:Border.all(color:t.colorScheme.primary,width:highlight?3:1),borderRadius:BorderRadius.circular(17)),child:const Row(children:[Icon(Icons.account_tree_outlined),SizedBox(width:10),Expanded(child:CopyText('Drop here to make top-level'))])))),
+     target('root-'+kind,null,(highlight)=>InkWell(onTap:widget.busy?null:()=>applyTarget('root-'+kind,null),borderRadius:BorderRadius.circular(17),child:AnimatedContainer(duration:const Duration(milliseconds:120),padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:highlight?t.colorScheme.primaryContainer:t.colorScheme.surface,border:Border.all(color:t.colorScheme.primary,width:highlight?3:1),borderRadius:BorderRadius.circular(17)),child:Row(children:[Icon(Icons.admin_panel_settings_outlined,color:t.colorScheme.primary),const SizedBox(width:10),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[CopyText(d['companyAdministrator']?.toString()??'Company administrator',style:t.textTheme.titleSmall,maxLines:1,overflow:TextOverflow.ellipsis),CopyText('Drop here to make top-level',style:t.textTheme.bodySmall)]))])))),
      const SizedBox(height:8),
     ],
     if(widget.busy)const LinearProgressIndicator(),
@@ -248,9 +248,9 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
        for(final p in records)if(graph.rects[p['id']]!=null)Positioned.fromRect(rect:graph.rects[p['id']]!,child:node(kind,p)),
       ])));}),
     )),
-    if(!departments&&!keyboard&&bounds.maxHeight>240)...[
+    if(!departments&&!keyboard&&bounds.maxHeight>280)...[
      const SizedBox(height:8),
-     ConstrainedBox(constraints:BoxConstraints(maxHeight:math.min(156.0,bounds.maxHeight*.38)),child:SingleChildScrollView(child:TideSurface(padding:const EdgeInsets.all(9),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+     ConstrainedBox(constraints:BoxConstraints(maxHeight:math.min(156.0,bounds.maxHeight*.34)),child:SingleChildScrollView(child:TideSurface(padding:const EdgeInsets.all(9),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
       SingleChildScrollView(scrollDirection:Axis.horizontal,child:Row(children:[
        for(final x in const [('person','Employees'),('role','Roles'),('department','Departments')])Padding(padding:const EdgeInsets.only(right:6),child:ChoiceChip(label:CopyText(x.$2),selected:tray==x.$1,onSelected:(_)=>setState((){tray=x.$1;picked=null;}))),
       ])),

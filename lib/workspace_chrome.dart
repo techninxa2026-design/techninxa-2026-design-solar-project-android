@@ -8,7 +8,7 @@ class WorkspaceHeader extends StatelessWidget implements PreferredSizeWidget{
  @override Size get preferredSize=>Size.fromHeight(approved?140:76);
  @override Widget build(BuildContext c){
   final t=Theme.of(c);final s=t.colorScheme;
-  return Material(color:s.surface,child:SafeArea(bottom:false,child:Padding(padding:const EdgeInsets.fromLTRB(16,8,16,10),child:Column(children:[
+  return Material(color:s.surface,child:SafeArea(bottom:false,child:Padding(padding:const EdgeInsets.fromLTRB(16,8,16,10),child:Column(mainAxisSize:MainAxisSize.min,children:[
    Row(children:[logo,const SizedBox(width:11),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
     CopyText(title,style:t.textTheme.titleLarge?.copyWith(fontWeight:FontWeight.w800,letterSpacing:-.5),maxLines:1,overflow:TextOverflow.ellipsis),
     CopyText(subtitle,style:t.textTheme.labelMedium?.copyWith(color:s.onSurfaceVariant),maxLines:1,overflow:TextOverflow.ellipsis),
