@@ -118,28 +118,7 @@ class Api extends ChangeNotifier {
     final fields=<String>{};
     if(e['fields'] is List)fields.addAll((e['fields'] as List).whereType<String>());
     if(e['errors'] is Map)fields.addAll(obj(e['errors']).keys);
-    final safeFields=fields.where((x)=>RegExp(r'^[A-Za-z0-9_.\[\]]{1,100}).hasMatch(x)).take(15).toList();
-    final fallback=switch(status){
-      400=>'Check the submitted fields.',
-      401=>'Authentication required or session expired.',
-      403=>'You do not have access to this action.',
-      404=>'Record not found.',
-      405=>'This HTTP operation is not allowed by the server.',
-      409=>'The record changed or additional verification is needed.',
-      413=>'The submitted file or form is too large.',
-      415=>'The server rejected the request content type.',
-      429=>'Too many requests. Try again later.',
-      503=>'The service is temporarily unavailable.',
-      >=300 && <400=>'The API unexpectedly redirected. Check server authentication and routing.',
-      _=>'Request failed.',
-    };
-    final detail=status>=400&&status<500?_safeTitle(e['title']):null;
-    final code=e['code']?.toString();
-    throw ApiFailure(status,detail??fallback,code,_trace(r,e),safeFields);
-  }
-  @override void dispose(){_http.close();super.dispose();}
-}
-).hasMatch(x)).take(15).toList();
+    final safeFields=fields.where((x)=>RegExp(r'^[A-Za-z0-9_.\[\]]{1,100}$').hasMatch(x)).take(15).toList();
     final fallback=switch(status){
       400=>'Check the submitted fields.',
       401=>'Authentication required or session expired.',
