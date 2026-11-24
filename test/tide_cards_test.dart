@@ -29,6 +29,8 @@ void main(){
       await tester.pumpAndSettle();
       expect(tester.takeException(),isNull);
       await tester.scrollUntilVisible(find.text('Solar installation with a long project title'),150,scrollable:find.byType(Scrollable).first);
+      await tester.ensureVisible(find.text('Solar installation with a long project title'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Solar installation with a long project title'));
       await tester.pumpAndSettle();
       expect(taps,1);
