@@ -43,7 +43,7 @@ class HierarchyBoard extends StatefulWidget{
  @override State<HierarchyBoard> createState()=>_HierarchyBoardState();
 }
 class _HierarchyBoardState extends State<HierarchyBoard>{
- bool departments=false;String search='';final transform=TransformationController();
+ bool departments=false;String search='';String tray='person';final transform=TransformationController();
  @override void dispose(){transform.dispose();super.dispose();}
  Map<String,dynamic> get d=>widget.data;
  List<Map<String,dynamic>> get positions=>rows(d['positions']);
@@ -91,36 +91,52 @@ class _HierarchyBoardState extends State<HierarchyBoard>{
   final scale=MediaQuery.textScalerOf(c).scale(14)/14;
   final graph=HierarchyLayout(records,departments?'parentDepartmentId':'parentPositionId',nodeW:math.max(220.0,220*scale),nodeH:math.max(166.0,166*scale));
   final t=Theme.of(c);
-  return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-   TideSurface(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-    CopyText(d['companyAdministrator']?.toString()??'Company administrator',style:t.textTheme.titleLarge),
-    const CopyText('Company-wide organizational root'),const SizedBox(height:12),
-    Wrap(spacing:8,runSpacing:6,children:[
-     ChoiceChip(label:const CopyText('Reporting chart'),selected:!departments,onSelected:(_)=>setState(()=>departments=false)),
-     ChoiceChip(label:const CopyText('Department chart'),selected:departments,onSelected:(_)=>setState(()=>departments=true)),
-     if(!departments)FilledButton.icon(onPressed:widget.busy?null:widget.onCreate,icon:const Icon(Icons.add),label:const CopyText('Create position')),
-    ]),
-    const SizedBox(height:12),const CopyText('Touch and hold a card, then drag it onto its new manager. Tap a card to edit instead. Changes require confirmation.'),
-    const SizedBox(height:10),TextField(onChanged:(v)=>setState(()=>search=v.trim().toLowerCase()),decoration:const InputDecoration(hintText:'Search hierarchy',prefixIcon:Icon(Icons.search_rounded))),
-   ])),
-   const SizedBox(height:10),
-   if(!departments)...[roster('Employees · hold to assign','person',rows(d['people'])),roster('Roles · hold to assign','role',rows(d['roles'])),roster('Departments · drop a position to transfer','department',depts)],
-   const SizedBox(height:10),
-   Row(children:[Expanded(child:CopyText(departments?'Department reporting tree':'Position reporting tree',style:t.textTheme.titleMedium)),IconButton(tooltip:'Zoom out',onPressed:()=>zoom(-.15),icon:const Icon(Icons.remove)),IconButton(tooltip:'Reset zoom',onPressed:()=>transform.value=Matrix4.identity(),icon:const Icon(Icons.fit_screen_outlined)),IconButton(tooltip:'Zoom in',onPressed:()=>zoom(.15),icon:const Icon(Icons.add))]),
-   target('root-'+kind,null,(highlight)=>AnimatedContainer(duration:const Duration(milliseconds:120),padding:const EdgeInsets.all(14),decoration:BoxDecoration(color:highlight?t.colorScheme.primaryContainer:t.colorScheme.surface,border:Border.all(color:t.colorScheme.primary,width:highlight?3:1),borderRadius:BorderRadius.circular(17)),child:const Row(children:[Icon(Icons.account_tree_outlined),SizedBox(width:10),Expanded(child:CopyText('Drop here to make top-level'))]))),
-   const SizedBox(height:8),if(widget.busy)const LinearProgressIndicator(),
-   if(records.isEmpty)const TideEmpty(message:'No positions or departments configured.')else Container(
-    height:470,clipBehavior:Clip.antiAlias,decoration:BoxDecoration(color:t.colorScheme.surfaceContainerLowest,border:Border.all(color:t.colorScheme.outlineVariant),borderRadius:BorderRadius.circular(20)),
-    child:InteractiveViewer(transformationController:transform,constrained:false,boundaryMargin:const EdgeInsets.all(100),minScale:.45,maxScale:1.6,
-     child:SizedBox(width:graph.width,height:graph.height,child:Stack(children:[
-      Positioned.fill(child:CustomPaint(painter:_Links(graph,t.colorScheme.primary.withValues(alpha:.5)))),
-      for(final p in records)if(graph.rects[p['id']]!=null)Positioned.fromRect(rect:graph.rects[p['id']]!,child:node(kind,p)),
-     ]))),
-   ),
-   const SizedBox(height:8),const CopyText('Pinch to zoom or swipe to explore the chart.'),
-  ]);
+  final keyboard=MediaQuery.viewInsetsOf(c).bottom>0;
+  return LayoutBuilder(builder:(c,bounds){
+   return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+    ConstrainedBox(constraints:BoxConstraints(maxHeight:bounds.maxHeight*(keyboard?.58:.39)),child:SingleChildScrollView(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+     Row(children:[Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+       CopyText(d['companyAdministrator']?.toString()??'Company administrator',style:t.textTheme.titleMedium),
+       const CopyText('Company-wide organizational root'),
+      ])),if(!departments)IconButton.filledTonal(tooltip:'Create position',onPressed:widget.busy?null:widget.onCreate,icon:const Icon(Icons.add_rounded))]),
+     const SizedBox(height:6),
+     Wrap(spacing:8,runSpacing:4,children:[
+      ChoiceChip(label:const CopyText('Reporting chart'),selected:!departments,onSelected:(_)=>setState(()=>departments=false)),
+      ChoiceChip(label:const CopyText('Department chart'),selected:departments,onSelected:(_)=>setState(()=>departments=true)),
+     ]),
+     const SizedBox(height:6),
+     TextField(onChanged:(v)=>setState(()=>search=v.trim().toLowerCase()),decoration:const InputDecoration(hintText:'Search hierarchy',prefixIcon:Icon(Icons.search_rounded),isDense:true)),
+     const SizedBox(height:6),
+     const CopyText('Hold a card and drag to move it. Tap a card to edit.'),
+    ]))),
+    if(!keyboard)...[
+     Row(children:[Expanded(child:CopyText(departments?'Department tree':'Position tree',style:t.textTheme.titleSmall)),IconButton(tooltip:'Zoom out',onPressed:()=>zoom(-.15),icon:const Icon(Icons.remove)),IconButton(tooltip:'Reset zoom',onPressed:()=>transform.value=Matrix4.identity(),icon:const Icon(Icons.fit_screen_outlined)),IconButton(tooltip:'Zoom in',onPressed:()=>zoom(.15),icon:const Icon(Icons.add))]),
+     target('root-'+kind,null,(highlight)=>AnimatedContainer(duration:const Duration(milliseconds:120),padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:highlight?t.colorScheme.primaryContainer:t.colorScheme.surface,border:Border.all(color:t.colorScheme.primary,width:highlight?3:1),borderRadius:BorderRadius.circular(17)),child:const Row(children:[Icon(Icons.account_tree_outlined),SizedBox(width:10),Expanded(child:CopyText('Drop here to make top-level'))]))),
+     const SizedBox(height:8),
+    ],
+    if(widget.busy)const LinearProgressIndicator(),
+    Expanded(child:records.isEmpty?const Center(child:TideEmpty(message:'No positions or departments configured.')):Container(
+     clipBehavior:Clip.antiAlias,decoration:BoxDecoration(color:t.colorScheme.surfaceContainerLowest,border:Border.all(color:t.colorScheme.outlineVariant),borderRadius:BorderRadius.circular(20)),
+     child:InteractiveViewer(transformationController:transform,constrained:false,boundaryMargin:const EdgeInsets.all(100),minScale:.45,maxScale:1.6,
+      child:SizedBox(width:graph.width,height:graph.height,child:Stack(children:[
+       Positioned.fill(child:CustomPaint(painter:_Links(graph,t.colorScheme.primary.withValues(alpha:.5)))),
+       for(final p in records)if(graph.rects[p['id']]!=null)Positioned.fromRect(rect:graph.rects[p['id']]!,child:node(kind,p)),
+      ]))),
+    )),
+    if(!departments&&!keyboard)...[
+     const SizedBox(height:8),
+     ConstrainedBox(constraints:BoxConstraints(maxHeight:bounds.maxHeight*.28),child:SingleChildScrollView(child:TideSurface(padding:const EdgeInsets.all(9),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+      SingleChildScrollView(scrollDirection:Axis.horizontal,child:Row(children:[
+       for(final x in const [('person','Employees'),('role','Roles'),('department','Departments')])Padding(padding:const EdgeInsets.only(right:6),child:ChoiceChip(label:CopyText(x.$2),selected:tray==x.$1,onSelected:(_)=>setState(()=>tray=x.$1))),
+      ])),
+      roster(tray=='person'?'Hold employee to assign':tray=='role'?'Hold role to assign':'Drop position here to transfer',tray,tray=='person'?rows(d['people']):tray=='role'?rows(d['roles']):depts),
+     ])))),
+    ],
+   ]);
+  });
  }
 }
+
 class HierarchyLayout{
  final Map<dynamic,Rect> rects={};final List<(dynamic,dynamic)> edges=[];
  late final double width,height;

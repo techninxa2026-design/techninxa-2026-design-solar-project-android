@@ -1,0 +1,8 @@
+# Workspace usability corrections — MVC main 08e53d4
+Source walkthrough from the perspective of a first-time user: opaque OPS role identifiers, inaccessible record labels, raw brand hex values, no global page search, and a read-only hierarchy list with duplicate records. Current authenticated device behavior has not been observed.
+
+- Display role/designation names from authorized role metadata, keeping code values intact for API binding. Unavailable names have a readable fallback; focused team pages load the permitted role catalog from organization overview.
+- Replace raw brand colors in record details with contrast-aware swatches; internal identifiers are hidden from record summaries. Existing color-picker values remain compatible.
+- Use the MVC /auth/me navigation metadata to implement Find a page, capped at 20 authorized results, with dedicated destinations for sidebar pages; no cross-company data indexing.
+- Reporting and department charts use real relationships, linked nodes, pan/zoom and touch-and-hold drags. The bottom tray stays alongside the chart on phones. Tap-to-edit remains an accessible alternative. All drag mutations use existing hierarchy API commands, with confirmation, current record revisions where required, no optimistic DB edits, and rejection/refresh.
+- Automated tests cover name resolution, permissions-aware search, graph command payloads and cycle prevention, color rendering and narrow viewport layout. Physical touch testing and role-specific production walkthrough remain outstanding. No server or database change.

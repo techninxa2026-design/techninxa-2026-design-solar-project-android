@@ -31,7 +31,7 @@ Map<String,dynamic> displayRecord(Map<String,dynamic> record,Map<String,dynamic>
  }
  return out;
 }
-bool internalDisplayField(String key)=>const {'id','rolecode','requestedrolecode','powercode','code','expectedupdatedutc','updatedutc','sortorder','createdbyuserid','assignedbyuserid','grantedbyuserid','parentgrantid','membershipid','parentpositionid','parentdepartmentid','companyid','userid','memberid','departmentid','zoneid','districtid','areaid','branchid','productid','packageid','packagenameid','bessid','inverterid','taskid','warehouseid','inventoryid','authoruserid','createduserid','installercompanyid','d acompanyid','track','level'}.contains(key.toLowerCase().replaceAll(' ',''));
+bool internalDisplayField(String key)=>const {'id','rolecode','requestedrolecode','powercode','code','expectedupdatedutc','updatedutc','sortorder','createdbyuserid','assignedbyuserid','grantedbyuserid','parentgrantid','membershipid','parentpositionid','parentdepartmentid','companyid','userid','memberid','departmentid','zoneid','districtid','areaid','branchid','productid','packageid','packagenameid','bessid','inverterid','taskid','warehouseid','inventoryid','authoruserid','createduserid','installercompanyid','dacompanyid','track','level'}.contains(key.toLowerCase().replaceAll(' ',''));
 class BrandColorPreview extends StatelessWidget{
  final String value;final String title;const BrandColorPreview({super.key,required this.value,required this.title});
  @override Widget build(BuildContext c){

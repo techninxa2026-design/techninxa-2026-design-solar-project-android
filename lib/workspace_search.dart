@@ -49,13 +49,17 @@ List<WorkspaceDestination> matchPages(List<WorkspaceDestination> pages,String qu
  final q=query.trim().toLowerCase();
  return pages.where((p)=>p.title.toLowerCase().contains(q)||(translate?.call(p.title).toLowerCase().contains(q)??false)).take(20).toList();
 }
-Future<WorkspaceDestination?> findWorkspacePage(BuildContext context,Api api)async{
- Map<String,dynamic> org={};
- if(api.me['workspace']!=null&&api.approved){
-  try{org=obj(await api.get('/organization'));}catch(_){}
- }
- if(!context.mounted)return null;
- return showTideSheet<WorkspaceDestination>(context,title:'Find a page',subtitle:'Search the pages you can access',icon:Icons.search_rounded,content:(_)=>WorkspaceSearchResults(pages:workspaceDestinations(api,organization:org)));
+Future<WorkspaceDestination?> findWorkspacePage(BuildContext context,Api api){
+ final scope=api.me['workspace'];
+ final user=api.me['userId'];
+ final lookup=()async{
+  if(scope==null||!api.approved)return <String,dynamic>{};
+  try{return obj(await api.get('/organization'));}catch(_){return <String,dynamic>{};}
+ }();
+ return showTideSheet<WorkspaceDestination>(context,title:'Find a page',subtitle:'Search the pages you can access',icon:Icons.search_rounded,content:(_)=>FutureBuilder<Map<String,dynamic>>(future:lookup,builder:(c,s){
+  if(api.me['userId']!=user||!identical(api.me['workspace'],scope))return const TideEmpty(message:'Workspace changed. Reopen search.');
+  return WorkspaceSearchResults(pages:workspaceDestinations(api,organization:s.data??{}));
+ }));
 }
 class WorkspaceSearchResults extends StatefulWidget{
  final List<WorkspaceDestination> pages;
