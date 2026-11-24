@@ -55,11 +55,11 @@ class WorkspaceNavigation extends StatelessWidget{
   // Match the supplied reference: one continuous strip, square top edge,
   // curved lower corners, evenly spaced icon-only destinations.
   return AnnotatedRegion<SystemUiOverlayStyle>(
-   value:SystemUiOverlayStyle.light.copyWith(systemNavigationBarColor:Theme.of(c).scaffoldBackgroundColor,systemNavigationBarIconBrightness:Theme.of(c).brightness==Brightness.dark?Brightness.light:Brightness.dark),
-   child:SafeArea(top:false,minimum:const EdgeInsets.only(bottom:3),child:Material(
+   value:SystemUiOverlayStyle.light.copyWith(systemNavigationBarColor:color,systemNavigationBarDividerColor:color,systemNavigationBarIconBrightness:Brightness.light,systemNavigationBarContrastEnforced:false),
+   child:Material(
     key:const ValueKey('workspace-navigation-strip'),
     color:color,borderRadius:workspaceBarShape,clipBehavior:Clip.antiAlias,
-    child:SizedBox(height:58,child:Row(children:items.map((n){
+    child:SafeArea(top:false,child:SizedBox(height:58,child:Row(children:items.map((n){
      final active=n.key==selected;
      return Expanded(child:Semantics(button:true,selected:active,label:tr(c,n.label),
       child:Tooltip(message:tr(c,n.label),excludeFromSemantics:true,child:InkWell(
@@ -70,8 +70,8 @@ class WorkspaceNavigation extends StatelessWidget{
         child:Icon(n.icon,size:26,color:Colors.white),
        )),
       ))));
-    }).toList())),
-   )),
+    }).toList()))),
+   ),
   );
  }
 }

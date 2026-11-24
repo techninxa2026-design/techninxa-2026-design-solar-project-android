@@ -34,6 +34,31 @@ void main(){
    expect(tester.takeException(),isNull);
   }
  });
+ testWidgets('Bottom bar fills the safe inset with the same blue surface',(tester)async{
+  tester.view.physicalSize=const Size(360,740);tester.view.devicePixelRatio=1;
+  tester.view.padding=const FakeViewPadding(bottom:24);
+  tester.view.viewPadding=const FakeViewPadding(bottom:24);
+  addTearDown(tester.view.resetPhysicalSize);addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.view.resetPadding);addTearDown(tester.view.resetViewPadding);
+  await tester.pumpWidget(MaterialApp(theme:tide(const Brand(),false),home:Scaffold(body:const SizedBox(),bottomNavigationBar:WorkspaceNavigation(items:const [WorkspaceNavItem('home','Home',Icons.home)],selected:'home',onSelect:(_){}))));
+  final rect=tester.getRect(find.byKey(const ValueKey('workspace-navigation-strip')));
+  expect(rect.bottom,740);expect(rect.height,82);
+  expect(tester.getRect(find.byKey(const ValueKey('nav-home'))).bottom,716);
+ });
+ testWidgets('Hierarchy editor is a broad working sheet, not a detail card',(tester)async{
+  tester.view.physicalSize=const Size(390,844);tester.view.devicePixelRatio=1;
+  addTearDown(tester.view.resetPhysicalSize);addTearDown(tester.view.resetDevicePixelRatio);
+  const data=<String,dynamic>{'roles':[{'code':'r','name':'Manager'}],'positions':[{'id':1,'roleCode':'r','updatedUtc':'2026-11-24T00:00:00Z'}]};
+  await tester.pumpWidget(MaterialApp(home:Scaffold(body:Builder(builder:(c)=>TextButton(onPressed:()=>showHierarchyEditor(c,data:data,refresh:()async=>data,onChange:(_)async{},onEdit:(_,__,___)async{},onCreate:(_)async{}),child:const Text('Open editor'))))));
+  await tester.tap(find.text('Open editor'));await tester.pumpAndSettle();
+  final rect=tester.getRect(find.byKey(const ValueKey('hierarchy-editor-sheet')));
+  expect(rect.width,390);expect(rect.height,greaterThan(780));
+  expect(find.byType(InteractiveViewer),findsOneWidget);
+  expect(find.byKey(const ValueKey('drag-position-1')),findsOneWidget);
+  expect(tester.takeException(),isNull);
+  await tester.tap(find.byTooltip('Close hierarchy editor'));await tester.pumpAndSettle();
+  expect(find.byType(InteractiveViewer),findsNothing);
+ });
  testWidgets('Actual drag handle emits the same move as MVC',(tester)async{
   tester.view.physicalSize=const Size(760,1050);tester.view.devicePixelRatio=1;
   addTearDown(tester.view.resetPhysicalSize);addTearDown(tester.view.resetDevicePixelRatio);

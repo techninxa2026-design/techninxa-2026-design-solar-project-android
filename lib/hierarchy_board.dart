@@ -41,12 +41,14 @@ HierarchyChange? hierarchyChange(Map<String,dynamic> source,HierarchyDrag from,S
 class HierarchyBoard extends StatefulWidget{
  final Map<String,dynamic> data;final bool busy;final ValueChanged<HierarchyChange> onChange;
  final void Function(Map<String,dynamic>,String) onEdit;final VoidCallback onCreate;
- const HierarchyBoard({super.key,required this.data,required this.busy,required this.onChange,required this.onEdit,required this.onCreate});
+ final void Function(Map<String,dynamic>?,String)? onOpenEditor;final bool initialDepartments;final Object? initialFocusId;
+ const HierarchyBoard({super.key,required this.data,required this.busy,required this.onChange,required this.onEdit,required this.onCreate,this.onOpenEditor,this.initialDepartments=false,this.initialFocusId});
  @override State<HierarchyBoard> createState()=>_HierarchyBoardState();
 }
 /// Readable reporting directory by default; visual editing is an explicit mode.
 class _HierarchyBoardState extends State<HierarchyBoard>{
- bool departments=false,chart=true;
+ late bool departments=widget.initialDepartments;bool chart=true;Object? focusId;
+ @override void initState(){super.initState();focusId=widget.initialFocusId;}
  final collapsed=<dynamic>{};String query='';
  Map<String,dynamic> get d=>widget.data;
  List<Map<String,dynamic>> get positions=>rows(d['positions']);
@@ -110,13 +112,13 @@ class _HierarchyBoardState extends State<HierarchyBoard>{
     TextButton.icon(onPressed:()=>setState(()=>chart=!chart),icon:Icon(chart?Icons.view_list_rounded:Icons.account_tree_outlined),label:CopyText(chart?'List view':'Visual editor')),
    ])),
    Wrap(spacing:8,runSpacing:4,children:[
-    ChoiceChip(label:const CopyText('Positions'),selected:!departments,onSelected:(_)=>setState((){departments=false;collapsed.clear();query='';})),
-    ChoiceChip(label:const CopyText('Departments'),selected:departments,onSelected:(_)=>setState((){departments=true;collapsed.clear();query='';})),
-    if(!departments)FilledButton.tonalIcon(onPressed:widget.busy?null:widget.onCreate,icon:const Icon(Icons.add),label:const CopyText('Add position')),
+    ChoiceChip(label:const CopyText('Positions'),selected:!departments,onSelected:(_)=>setState((){departments=false;focusId=null;collapsed.clear();query='';})),
+    ChoiceChip(label:const CopyText('Departments'),selected:departments,onSelected:(_)=>setState((){departments=true;focusId=null;collapsed.clear();query='';})),
+    if(widget.onOpenEditor!=null)FilledButton.icon(onPressed:widget.busy?null:()=>widget.onOpenEditor!(null,departments?'department':'position'),icon:const Icon(Icons.open_in_full_rounded),label:const CopyText('Edit hierarchy'))else if(!departments)FilledButton.tonalIcon(onPressed:widget.busy?null:widget.onCreate,icon:const Icon(Icons.add),label:const CopyText('Add position')),
    ]),
    const SizedBox(height:8),
    if(widget.busy)const LinearProgressIndicator(),
-   Expanded(child:chart?_HierarchyGraph(key:ValueKey(departments),data:d,busy:widget.busy,onChange:widget.onChange,onEdit:widget.onEdit,onCreate:widget.onCreate,departments:departments):ListView(children:[
+   Expanded(child:chart?_HierarchyGraph(key:ValueKey(departments),data:d,busy:widget.busy,onChange:widget.onChange,onEdit:widget.onOpenEditor==null?widget.onEdit:(row,kind)=>widget.onOpenEditor!(row,kind),onCreate:widget.onCreate,departments:departments,initialFocusId:focusId):ListView(children:[
     TideSurface(tinted:true,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
      Row(children:[const TideGlyph(Icons.admin_panel_settings_outlined,size:44),const SizedBox(width:12),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[CopyText(d['companyAdministrator']?.toString()??'Company administrator',style:t.textTheme.titleMedium),const CopyText('Company administrator')]))]),
      const SizedBox(height:12),Wrap(spacing:16,runSpacing:6,children:[CopyText(positions.length.toString()+' positions'),CopyText(depts.length.toString()+' departments')]),
@@ -126,6 +128,78 @@ class _HierarchyBoardState extends State<HierarchyBoard>{
     const SizedBox(height:14),if(entries.isEmpty)const TideEmpty(message:'No matching positions or departments.'),...entries,
    ])),
   ]);
+ }
+}
+/// A wide, near-full-height editing workspace. It owns the fresh chart
+/// snapshot so confirmed mutations remain visible without closing the sheet.
+Future<void> showHierarchyEditor(
+ BuildContext context,{
+ required Map<String,dynamic> data,
+ required Future<Map<String,dynamic>> Function() refresh,
+ required Future<void> Function(HierarchyChange) onChange,
+ required Future<void> Function(Map<String,dynamic>,String,Map<String,dynamic>) onEdit,
+ required Future<void> Function(Map<String,dynamic>) onCreate,
+ bool initialDepartments=false,Object? initialFocusId,
+})=>showModalBottomSheet<void>(
+ context:context,isScrollControlled:true,useSafeArea:true,
+ enableDrag:false,isDismissible:false,backgroundColor:Colors.transparent,
+ constraints:BoxConstraints(maxWidth:MediaQuery.sizeOf(context).width),
+ builder:(c)=>FractionallySizedBox(heightFactor:.97,child:_HierarchyEditorSheet(
+  data:data,refresh:refresh,onChange:onChange,onEdit:onEdit,onCreate:onCreate,
+  initialDepartments:initialDepartments,initialFocusId:initialFocusId,
+ )),
+);
+
+class _HierarchyEditorSheet extends StatefulWidget{
+ final Map<String,dynamic> data;
+ final Future<Map<String,dynamic>> Function() refresh;
+ final Future<void> Function(HierarchyChange) onChange;
+ final Future<void> Function(Map<String,dynamic>,String,Map<String,dynamic>) onEdit;
+ final Future<void> Function(Map<String,dynamic>) onCreate;
+ final bool initialDepartments;final Object? initialFocusId;
+ const _HierarchyEditorSheet({required this.data,required this.refresh,required this.onChange,required this.onEdit,required this.onCreate,required this.initialDepartments,this.initialFocusId});
+ @override State<_HierarchyEditorSheet> createState()=>_HierarchyEditorSheetState();
+}
+class _HierarchyEditorSheetState extends State<_HierarchyEditorSheet>{
+ late Map<String,dynamic> data=widget.data;
+ bool busy=false;String? failure;
+ Future<void> run(Future<void> Function() action)async{
+  if(busy)return;
+  setState((){busy=true;failure=null;});
+  try{
+   await action();
+   if(!mounted)return;
+   final latest=await widget.refresh();
+   if(mounted)setState(()=>data=latest);
+  }catch(e){if(mounted)setState(()=>failure='Unable to refresh the hierarchy. Retry before making another change.');}
+  finally{if(mounted)setState(()=>busy=false);}
+ }
+ @override Widget build(BuildContext c){
+  final t=Theme.of(c);final color=t.appBarTheme.backgroundColor??t.colorScheme.primary;
+  return PopScope(canPop:!busy,child:Material(
+   key:const ValueKey('hierarchy-editor-sheet'),
+   color:t.scaffoldBackgroundColor,borderRadius:const BorderRadius.vertical(top:Radius.circular(24)),clipBehavior:Clip.antiAlias,
+   child:SafeArea(top:false,child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
+    ColoredBox(color:color,child:Padding(padding:const EdgeInsets.fromLTRB(16,12,8,12),child:Row(children:[
+     const Icon(Icons.account_tree_outlined,color:Colors.white,size:28),const SizedBox(width:12),
+     const Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+      CopyText('Hierarchy editor',style:TextStyle(color:Colors.white,fontSize:19,fontWeight:FontWeight.w800)),
+      CopyText('Drag positions or tap to edit',style:TextStyle(color:Colors.white,fontSize:12)),
+     ])),
+     IconButton(tooltip:'Close hierarchy editor',onPressed:busy?null:()=>Navigator.pop(c),color:Colors.white,icon:const Icon(Icons.close_rounded)),
+    ]))),
+    if(failure!=null)Padding(padding:const EdgeInsets.all(8),child:Row(children:[
+     Expanded(child:CopyText(failure!,style:t.textTheme.bodySmall?.copyWith(color:t.colorScheme.error))),
+     TextButton(onPressed:busy?null:()=>run(()async{}),child:const CopyText('Retry')),
+    ])),
+    Expanded(child:Padding(padding:const EdgeInsets.fromLTRB(8,8,8,4),child:HierarchyBoard(
+     data:data,busy:busy||failure!=null,initialDepartments:widget.initialDepartments,initialFocusId:widget.initialFocusId,
+     onChange:(change)=>run(()=>widget.onChange(change)),
+     onEdit:(row,kind)=>run(()=>widget.onEdit(row,kind,data)),
+     onCreate:()=>run(()=>widget.onCreate(data)),
+    ))),
+   ])),
+  ));
  }
 }
 class _HierarchyChoices extends StatefulWidget{
@@ -147,8 +221,8 @@ class _HierarchyChoicesState extends State<_HierarchyChoices>{
  }
 }
 class _HierarchyGraph extends StatefulWidget{
- final Map<String,dynamic> data;final bool busy;final ValueChanged<HierarchyChange> onChange;final void Function(Map<String,dynamic>,String) onEdit;final VoidCallback onCreate;final bool departments;
- const _HierarchyGraph({super.key,required this.data,required this.busy,required this.onChange,required this.onEdit,required this.onCreate,required this.departments});
+ final Map<String,dynamic> data;final bool busy;final ValueChanged<HierarchyChange> onChange;final void Function(Map<String,dynamic>,String) onEdit;final VoidCallback onCreate;final bool departments;final Object? initialFocusId;
+ const _HierarchyGraph({super.key,required this.data,required this.busy,required this.onChange,required this.onEdit,required this.onCreate,required this.departments,this.initialFocusId});
  @override State<_HierarchyGraph> createState()=>_HierarchyGraphState();
 }
 class _HierarchyGraphState extends State<_HierarchyGraph>{
@@ -242,7 +316,7 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
     if(picked!=null)Padding(padding:const EdgeInsets.only(bottom:6),child:Row(children:[Expanded(child:CopyText('Selected: '+title(picked!.kind,picked!.row)+' · tap a highlighted destination',style:t.textTheme.labelMedium)),IconButton(tooltip:'Cancel selection',onPressed:()=>setState(()=>picked=null),icon:const Icon(Icons.close))])),
     Expanded(child:records.isEmpty?const Center(child:TideEmpty(message:'No positions or departments configured.')):Container(
      clipBehavior:Clip.antiAlias,decoration:BoxDecoration(color:t.colorScheme.surfaceContainerLowest,border:Border.all(color:t.colorScheme.outlineVariant),borderRadius:BorderRadius.circular(20)),
-     child:LayoutBuilder(builder:(c,b){viewport=Size(b.maxWidth,b.maxHeight);if(!initialized){initialized=true;WidgetsBinding.instance.addPostFrameCallback((_) {if(mounted)fit(graph);});}return InteractiveViewer(key:canvasKey,transformationController:transform,constrained:false,panEnabled:!dragging,scaleEnabled:!dragging,boundaryMargin:const EdgeInsets.all(300),minScale:.2,maxScale:1.6,
+     child:LayoutBuilder(builder:(c,b){viewport=Size(b.maxWidth,b.maxHeight);if(!initialized){initialized=true;WidgetsBinding.instance.addPostFrameCallback((_) {if(mounted){final target=graph.rects[widget.initialFocusId];if(target==null){fit(graph);}else{final size=viewport!;final scale=math.min(1.0,math.min(size.width/target.width,size.height/target.height)).clamp(.2,1.0).toDouble();final m=Matrix4.diagonal3Values(scale,scale,1);m.setTranslationRaw(size.width/2-target.center.dx*scale,size.height/2-target.center.dy*scale,0);transform.value=m;}}});}return InteractiveViewer(key:canvasKey,transformationController:transform,constrained:false,panEnabled:!dragging,scaleEnabled:!dragging,boundaryMargin:const EdgeInsets.all(300),minScale:.2,maxScale:1.6,
       child:SizedBox(width:graph.width,height:graph.height,child:Stack(children:[
        Positioned.fill(child:CustomPaint(painter:_Links(graph,t.colorScheme.primary.withValues(alpha:.5)))),
        for(final p in records)if(graph.rects[p['id']]!=null)Positioned.fromRect(rect:graph.rects[p['id']]!,child:node(kind,p)),
