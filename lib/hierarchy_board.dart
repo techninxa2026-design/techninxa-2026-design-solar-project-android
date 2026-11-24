@@ -250,11 +250,11 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
  String person(Map<String,dynamic> p)=>p['userId']==null?'Open position':rows(d['people']).where((u)=>u['id']==p['userId']).firstOrNull?['fullName']?.toString()??'Employee unavailable';
  String dept(Map<String,dynamic> p)=>p['departmentId']==null?'Company-wide':depts.where((x)=>x['id']==p['departmentId']).firstOrNull?['name']?.toString()??'Department unavailable';
  String title(String kind,Map<String,dynamic> p)=>kind=='position'?role(p):(p['name']??p['fullName']??'Unavailable').toString();
- void zoom(double delta){final previous=transform.value.getMaxScaleOnAxis();final scale=(previous+delta).clamp(.2,1.6).toDouble();final center=viewport==null?Offset.zero:viewport!.center(Offset.zero);final scene=transform.toScene(center);final m=Matrix4.diagonal3Values(scale,scale,1);m.setTranslationRaw(center.dx-scene.dx*scale,center.dy-scene.dy*scale,0);transform.value=m;}
+ void zoom(double delta){final previous=transform.value.getMaxScaleOnAxis();final scale=(previous+delta).clamp(.2,1.6).toDouble();final center=viewport==null?Offset.zero:viewport!.center(Offset.zero);final scene=transform.toScene(center);final m=Matrix4.diagonal3Values(scale,scale,scale);m.setTranslationRaw(center.dx-scene.dx*scale,center.dy-scene.dy*scale,0);transform.value=m;}
  void openReadable(HierarchyLayout graph){
   final size=viewport;if(size==null||size.width<=0)return;
   final scale=math.min(1.0,math.max(.85,size.width/graph.width));
-  final m=Matrix4.diagonal3Values(scale,scale,1);
+  final m=Matrix4.diagonal3Values(scale,scale,scale);
   m.setTranslationRaw(size.width/2-graph.root.center.dx*scale,8,0);transform.value=m;
  }
  Widget rootCard(String kind){
@@ -270,7 +270,7 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
      ])),
     ])))));
  }
- void fit(HierarchyLayout graph){final size=viewport;if(size==null||size.width<=0||size.height<=0)return;final scale=math.min(size.width/graph.width,size.height/graph.height).clamp(.2,1.0).toDouble();final m=Matrix4.diagonal3Values(scale,scale,1);m.setTranslationRaw(math.max(0.0,(size.width-graph.width*scale)/2),math.max(0.0,(size.height-graph.height*scale)/2),0);transform.value=m;}
+ void fit(HierarchyLayout graph){final size=viewport;if(size==null||size.width<=0||size.height<=0)return;final scale=math.min(size.width/graph.width,size.height/graph.height).clamp(.2,1.0).toDouble();final m=Matrix4.diagonal3Values(scale,scale,scale);m.setTranslationRaw(math.max(0.0,(size.width-graph.width*scale)/2),math.max(0.0,(size.height-graph.height*scale)/2),0);transform.value=m;}
  Widget feedback(String text)=>Material(color:Colors.transparent,child:Container(width:210,padding:const EdgeInsets.all(14),decoration:BoxDecoration(color:Theme.of(context).colorScheme.primary,borderRadius:BorderRadius.circular(18)),child:Text(text,style:TextStyle(color:Theme.of(context).colorScheme.onPrimary,fontWeight:FontWeight.bold))));
  void edgePan(DragUpdateDetails details){
   final box=canvasKey.currentContext?.findRenderObject();if(box is! RenderBox)return;
@@ -360,7 +360,7 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
     if(picked!=null)Padding(padding:const EdgeInsets.only(bottom:6),child:Row(children:[Expanded(child:CopyText('Selected: '+title(picked!.kind,picked!.row)+' · tap a highlighted destination',style:t.textTheme.labelMedium)),IconButton(tooltip:'Cancel selection',onPressed:()=>setState(()=>picked=null),icon:const Icon(Icons.close))])),
     Expanded(child:records.isEmpty?const Center(child:TideEmpty(message:'No positions or departments configured.')):Container(
      key:const ValueKey('hierarchy-canvas'),clipBehavior:Clip.antiAlias,decoration:BoxDecoration(gradient:LinearGradient(begin:Alignment.topLeft,end:Alignment.bottomRight,colors:[t.colorScheme.surface,t.colorScheme.primary.withValues(alpha:.10)]),border:Border.all(color:t.colorScheme.outlineVariant),borderRadius:BorderRadius.circular(22)),
-     child:LayoutBuilder(builder:(c,b){viewport=Size(b.maxWidth,b.maxHeight);if(!initialized){initialized=true;WidgetsBinding.instance.addPostFrameCallback((_) {if(mounted){final target=graph.rects[widget.initialFocusId];if(target==null){openReadable(graph);}else{final size=viewport!;final scale=math.min(1.0,math.min(size.width/target.width,size.height/target.height)).clamp(.2,1.0).toDouble();final m=Matrix4.diagonal3Values(scale,scale,1);m.setTranslationRaw(size.width/2-target.center.dx*scale,size.height/2-target.center.dy*scale,0);transform.value=m;}}});}return InteractiveViewer(key:canvasKey,transformationController:transform,constrained:false,panEnabled:!dragging,scaleEnabled:!dragging,boundaryMargin:const EdgeInsets.all(300),minScale:.2,maxScale:1.6,
+     child:LayoutBuilder(builder:(c,b){viewport=Size(b.maxWidth,b.maxHeight);if(!initialized){initialized=true;WidgetsBinding.instance.addPostFrameCallback((_) {if(mounted){final target=graph.rects[widget.initialFocusId];if(target==null){openReadable(graph);}else{final size=viewport!;final scale=math.min(1.0,math.min(size.width/target.width,size.height/target.height)).clamp(.2,1.0).toDouble();final m=Matrix4.diagonal3Values(scale,scale,scale);m.setTranslationRaw(size.width/2-target.center.dx*scale,size.height/2-target.center.dy*scale,0);transform.value=m;}}});}return InteractiveViewer(key:canvasKey,transformationController:transform,constrained:false,panEnabled:!dragging,scaleEnabled:!dragging,boundaryMargin:const EdgeInsets.all(300),minScale:.2,maxScale:1.6,
       child:SizedBox(width:graph.width,height:graph.height,child:Stack(children:[
        Positioned.fill(child:CustomPaint(painter:_Links(graph,t.colorScheme.primary.withValues(alpha:.65)))),
        Positioned.fromRect(rect:graph.root,child:rootCard(kind)),
@@ -374,7 +374,7 @@ class _HierarchyGraphState extends State<_HierarchyGraph>{
        Expanded(child:Center(child:Container(width:34,height:4,decoration:BoxDecoration(color:t.colorScheme.outline,borderRadius:BorderRadius.circular(5))))),
        Icon(trayExpanded?Icons.expand_more_rounded:Icons.expand_less_rounded,size:22,color:t.colorScheme.primary),
       ]))),
-      if(trayExpanded)...[
+      if(trayExpanded&&bounds.maxHeight>=340)...[
        Padding(padding:const EdgeInsets.symmetric(horizontal:7),child:Row(children:[
         for(final x in const [('person','Employees',Icons.person_outline),('role','Roles',Icons.badge_outlined),('department','Departments',Icons.layers_outlined)])Expanded(child:Padding(padding:const EdgeInsets.symmetric(horizontal:2),child:_HierarchySegment(label:x.$2,icon:x.$3,selected:tray==x.$1,onTap:()=>setState((){tray=x.$1;picked=null;})))),
        ])),
@@ -394,19 +394,19 @@ class HierarchyLayout{
  HierarchyLayout(List<Map<String,dynamic>> records,String parent,{required double nodeW,required double nodeH}){
   final byId={for(final p in records)p['id']:p};final children=<dynamic,List<dynamic>>{};
   for(final p in records){(children[p[parent]]??=[]).add(p['id']);}
-  final visited=<dynamic>{};double cursor=18;int deepest=0;
+  final visited=<dynamic>{};double cursor=18;int deepest=0;final rootHeight=math.max(76.0,nodeH*.73);final top=rootHeight+26;
   double place(dynamic id,int depth){
    if(!visited.add(id))return cursor;
    deepest=math.max(deepest,depth);final xs=<double>[];
    for(final child in children[id]??[]){if(!visited.contains(child)){xs.add(place(child,depth+1));edges.add((id,child));}}
    final double x;if(xs.isEmpty){x=cursor;cursor+=nodeW+28;}else{x=(xs.first+xs.last)/2;}
-   rects[id]=Rect.fromLTWH(x,102+depth*(nodeH+34),nodeW,nodeH);return x;
+   rects[id]=Rect.fromLTWH(x,top+depth*(nodeH+34),nodeW,nodeH);return x;
   }
   for(final p in records){if(!byId.containsKey(p[parent])||p[parent]==p['id']){if(!visited.contains(p['id'])){roots.add(p['id']);place(p['id'],0);}}}
   for(final p in records){if(!visited.contains(p['id'])){roots.add(p['id']);place(p['id'],0);}}
-  width=math.max(nodeW+36,cursor);height=math.max(180.0,120+(deepest+1)*nodeH+deepest*34);
+  width=math.max(nodeW+36,cursor);height=math.max(180.0,top+18+(deepest+1)*nodeH+deepest*34);
   final center=roots.isEmpty?width/2:(rects[roots.first]!.center.dx+rects[roots.last]!.center.dx)/2;
-  root=Rect.fromLTWH(center-nodeW/2,12,nodeW,76);
+  root=Rect.fromLTWH(center-nodeW/2,12,nodeW,rootHeight);
  }
 }
 class _Links extends CustomPainter{

@@ -59,7 +59,13 @@ void main(){
   expect(find.byKey(const ValueKey('drag-position-1')),findsOneWidget);
   expect(find.text('Company (Admin)'),findsOneWidget);
   final viewer=tester.widget<InteractiveViewer>(find.byType(InteractiveViewer));
-  expect(viewer.transformationController!.value.getMaxScaleOnAxis(),greaterThanOrEqualTo(.85));
+  expect(viewer.transformationController!.value.entry(0,0),greaterThanOrEqualTo(.85));
+  final before=viewer.transformationController!.value.entry(0,0);
+  await tester.tap(find.byTooltip('Zoom out'));await tester.pumpAndSettle();
+  expect(viewer.transformationController!.value.entry(0,0),lessThan(before));
+  final once=viewer.transformationController!.value.entry(0,0);
+  await tester.tap(find.byTooltip('Zoom out'));await tester.pumpAndSettle();
+  expect(viewer.transformationController!.value.entry(0,0),lessThan(once));
   expect(tester.takeException(),isNull);
   await tester.tap(find.byTooltip('Close hierarchy editor'));await tester.pumpAndSettle();
   expect(find.byType(InteractiveViewer),findsNothing);
