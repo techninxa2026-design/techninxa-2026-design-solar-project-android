@@ -26,6 +26,6 @@ void showFeedback(String message,{FeedbackKind kind=FeedbackKind.info,BuildConte
       const SizedBox(height:4),CopyText(message,style:theme.textTheme.bodyMedium?.copyWith(color:s.onSurface),maxLines:5,overflow:TextOverflow.ellipsis),
      ])),
     ]))),
-    Align(alignment:Alignment.topCenter,child:IconButton(tooltip:'Dismiss message',onPressed:messenger.hideCurrentSnackBar,icon:Icon(Icons.close_rounded,color:s.onSurfaceVariant,size:19))),
+    Align(alignment:Alignment.topCenter,child:IconButton(tooltip:'Dismiss message',onPressed:()=>messenger.hideCurrentSnackBar(),icon:Icon(Icons.close_rounded,color:s.onSurfaceVariant,size:19))),
    ]))))));
 }

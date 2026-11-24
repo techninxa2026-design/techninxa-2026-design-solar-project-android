@@ -5,7 +5,7 @@ class WorkspaceHeader extends StatelessWidget implements PreferredSizeWidget{
  final Widget logo;final String title,subtitle;final int unread;final bool approved;
  final VoidCallback onNotifications,onAccount,onSearch;
  const WorkspaceHeader({super.key,required this.logo,required this.title,required this.subtitle,required this.unread,required this.approved,required this.onNotifications,required this.onAccount,required this.onSearch});
- @override Size get preferredSize=>Size.fromHeight(approved?132:72);
+ @override Size get preferredSize=>Size.fromHeight(approved?140:76);
  @override Widget build(BuildContext c){
   final t=Theme.of(c);final s=t.colorScheme;
   return Material(color:s.surface,child:SafeArea(bottom:false,child:Padding(padding:const EdgeInsets.fromLTRB(16,8,16,10),child:Column(children:[
