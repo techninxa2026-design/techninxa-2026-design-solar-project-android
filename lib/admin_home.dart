@@ -43,7 +43,7 @@ class _AdminHomeState extends State<AdminHome>{
        _AdminAction(icon:Icons.add_business_rounded,title:'Register company',subtitle:'Add a DA or Installer',onTap:()=>after(widget.register)),
        _AdminAction(icon:Icons.space_dashboard_outlined,title:'Open workspace',subtitle:'Work inside a company',onTap:()=>after(widget.choose)),
       ];
-      return box.maxWidth>=330&&MediaQuery.textScalerOf(c).scale(14)<=18?Row(crossAxisAlignment:CrossAxisAlignment.start,children:[Expanded(child:tiles[0]),const SizedBox(width:10),Expanded(child:tiles[1])]):Column(children:[tiles[0],const SizedBox(height:10),tiles[1]]);
+      return box.maxWidth>=280&&MediaQuery.textScalerOf(c).scale(14)<=17?Row(crossAxisAlignment:CrossAxisAlignment.start,children:[Expanded(child:tiles[0]),const SizedBox(width:10),Expanded(child:tiles[1])]):Column(children:[tiles[0],const SizedBox(height:10),tiles[1]]);
      }),
      const SizedBox(height:10),TideSurface(onTap:widget.openNotifications,padding:const EdgeInsets.all(13),child:Row(children:[
       const TideGlyph(Icons.notifications_active_outlined,size:44),const SizedBox(width:12),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[CopyText('Notifications',style:t.textTheme.titleSmall),CopyText(widget.unread==0?'No unread notifications':widget.unread.toString()+' unread updates',style:t.textTheme.bodySmall)])),
@@ -73,18 +73,17 @@ class _NetworkOverview extends StatelessWidget{
      Row(children:[const Expanded(child:CopyText('COMPANY NETWORK',style:TextStyle(color:Color(0xffcae9f8),fontSize:11,fontWeight:FontWeight.w800,letterSpacing:1.4))),IconButton(tooltip:'View company directory',onPressed:onOpen,icon:const Icon(Icons.arrow_outward_rounded,color:Colors.white))]),
      CopyText(total.toString(),style:const TextStyle(color:Colors.white,fontSize:52,height:1,fontWeight:FontWeight.w800,letterSpacing:-2)),
      const SizedBox(height:5),const CopyText('Registered companies',style:TextStyle(color:Colors.white,fontSize:15)),
-     const SizedBox(height:20),ClipRRect(borderRadius:BorderRadius.circular(8),child:LinearProgressIndicator(value:pct,minHeight:9,backgroundColor:Colors.white24,valueColor:const AlwaysStoppedAnimation(Color(0xff80e4c6)))),
+     const SizedBox(height:14),ClipRRect(borderRadius:BorderRadius.circular(8),child:LinearProgressIndicator(value:pct,minHeight:9,backgroundColor:Colors.white24,valueColor:const AlwaysStoppedAnimation(Color(0xff80e4c6)))),
      const SizedBox(height:10),Wrap(spacing:18,runSpacing:8,children:[_legend(const Color(0xff80e4c6),active.toString()+' active'),_legend(Colors.white54,inactive.toString()+' inactive')]),
+     const SizedBox(height:16),const Divider(color:Colors.white24,height:1),const SizedBox(height:12),
+     LayoutBuilder(builder:(c,box){final items=[_metric(c,'Demand Aggregators',da,Icons.solar_power_outlined),_metric(c,'Installers',installers,Icons.engineering_outlined)];return box.maxWidth>=240&&MediaQuery.textScalerOf(c).scale(14)<=17?Row(crossAxisAlignment:CrossAxisAlignment.start,children:[Expanded(child:items[0]),const SizedBox(width:12),Expanded(child:items[1])]):Column(children:[items[0],const SizedBox(height:10),items[1]]);}),
     ])),
    ]))),
-   const SizedBox(height:10),LayoutBuilder(builder:(c,box){
-    final tiles=[_metric(c,'Demand Aggregators',da,Icons.solar_power_outlined),_metric(c,'Installers',installers,Icons.engineering_outlined)];
-    return box.maxWidth>=310&&MediaQuery.textScalerOf(c).scale(14)<=18?Row(children:[Expanded(child:tiles[0]),const SizedBox(width:10),Expanded(child:tiles[1])]):Column(children:[tiles[0],const SizedBox(height:10),tiles[1]]);
-   }),
+
   ]);
  }
  Widget _legend(Color color,String text)=>Row(mainAxisSize:MainAxisSize.min,children:[Container(width:9,height:9,decoration:BoxDecoration(color:color,shape:BoxShape.circle)),const SizedBox(width:7),CopyText(text,style:const TextStyle(color:Colors.white,fontWeight:FontWeight.w600,fontSize:13))]);
- Widget _metric(BuildContext c,String label,int count,IconData icon)=>TideSurface(onTap:onOpen,padding:const EdgeInsets.all(14),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[TideGlyph(icon,size:38),const SizedBox(height:9),CopyText(count.toString(),style:Theme.of(c).textTheme.headlineMedium?.copyWith(fontWeight:FontWeight.w800)),CopyText(label,style:Theme.of(c).textTheme.bodySmall)]));
+ Widget _metric(BuildContext c,String label,int count,IconData icon)=>Row(crossAxisAlignment:CrossAxisAlignment.start,children:[Container(width:34,height:34,decoration:BoxDecoration(color:Colors.white.withValues(alpha:.13),borderRadius:BorderRadius.circular(11)),child:Icon(icon,color:Colors.white,size:20)),const SizedBox(width:8),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[CopyText(count.toString(),style:const TextStyle(color:Colors.white,fontSize:22,fontWeight:FontWeight.w800,height:1.1)),const SizedBox(height:4),CopyText(label,style:const TextStyle(color:Color(0xffcae9f8),fontSize:12,height:1.2))]))]);
 }
 class _AdminAction extends StatelessWidget{
  final IconData icon;final String title,subtitle;final VoidCallback onTap;

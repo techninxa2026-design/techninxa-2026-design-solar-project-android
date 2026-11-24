@@ -38,7 +38,7 @@ List<WorkspaceDestination> workspaceDestinations(Api api,{Map<String,dynamic> or
   if(rights.contains('department.create'))out.add(const WorkspaceDestination('Assign managers & employees','departments','DEPARTMENT TEAM',focus:'departmentMembers'));
   if(api.me['canViewSales']==true)out.add(const WorkspaceDestination('Sales Records','sales','SALES'));
  }
- if(api.superAdmin){out.addAll(const [WorkspaceDestination('Company directory','companies','PLATFORM ADMINISTRATION',description:'Demand Aggregator & Installer workspaces'),WorkspaceDestination('Register company','register-company','PLATFORM ADMINISTRATION',description:'Add a Demand Aggregator or Installer'),WorkspaceDestination('Open workspace','choose-workspace','PLATFORM ADMINISTRATION',description:'Select an active company')]);}
+ if(api.superAdmin){out.addAll(const [WorkspaceDestination('Company directory','companies','PLATFORM ADMINISTRATION',description:'Manage companies, Demand Aggregator & Installer workspaces'),WorkspaceDestination('Register company','register-company','PLATFORM ADMINISTRATION',description:'Add a Demand Aggregator or Installer'),WorkspaceDestination('Open workspace','choose-workspace','PLATFORM ADMINISTRATION',description:'Select an active company')]);}
  final assigned=api.me['hasAssignedTasks']==true;
  if(workspace&&(assigned||rights.any((p)=>['task.assign','task.create','task.report'].contains(p))))out.add(const WorkspaceDestination('Installer assignments & responses','dispatches','CROSS-COMPANY TASKS'));
  if(workspace&&assigned&&!rights.any((p)=>['task.create','task.assign','task.monitor.assign','task.report'].contains(p)))out.add(const WorkspaceDestination('Assigned Tasks','tasks','MY WORK'));
