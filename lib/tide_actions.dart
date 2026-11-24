@@ -86,8 +86,7 @@ class CompanyIdentityCard extends StatelessWidget {
               CopyText(kind,style:t.textTheme.bodySmall?.copyWith(color:t.colorScheme.onSurfaceVariant)),
               if(slug.isNotEmpty)CopyText(slug,style:t.textTheme.bodySmall),
             ])),
-            if(onMore!=null)IconButton(tooltip:'Company actions',onPressed:onMore,icon:const Icon(Icons.more_horiz))
-            else if(onTap!=null)Icon(Icons.arrow_outward_rounded,color:t.colorScheme.primary,size:20),
+            if(onMore==null&&onTap!=null)Icon(Icons.arrow_outward_rounded,color:t.colorScheme.primary,size:20),
           ]),
           const SizedBox(height:12),
           Wrap(spacing:12,runSpacing:8,crossAxisAlignment:WrapCrossAlignment.center,children:[
@@ -95,6 +94,7 @@ class CompanyIdentityCard extends StatelessWidget {
             if(memberCount!=null)CopyText('$memberCount members',style:t.textTheme.labelMedium),
           ]),
           if(rawAddress.isNotEmpty)...[const SizedBox(height:12),TideMapLink(address:rawAddress,compact:true)],
+          if(onMore!=null)...[const SizedBox(height:12),OutlinedButton.icon(onPressed:onMore,icon:const Icon(Icons.tune_rounded),label:const CopyText('Company actions'))],
         ])),
       ],
     ));
@@ -165,18 +165,15 @@ class TideActionDock extends StatelessWidget {
     if(actions.isEmpty)return const SizedBox.shrink();
     final primary=actions.where((a)=>!a.destructive).firstOrNull;
     final rest=actions.where((a)=>!identical(a,primary)).toList();
-    if(compact)return Align(alignment:Alignment.centerRight,child:IconButton.filledTonal(tooltip:'Actions',onPressed:()=>showTideActions(context,actions,title:title),icon:const Icon(Icons.more_horiz_rounded)));
-    return TideSurface(padding:const EdgeInsets.all(8),child:Row(children:[
-      if(primary!=null)Expanded(child:FilledButton.icon(
-        onPressed:primary.onTap,icon:Icon(primary.icon,size:20),
-        label:CopyText(primary.title,textAlign:TextAlign.center))),
-      if(primary!=null&&rest.isNotEmpty)const SizedBox(width:8),
-      if(rest.isNotEmpty&&primary!=null)IconButton.filledTonal(
-        tooltip:'More actions',onPressed:()=>showTideActions(context,rest,title:title),
-        icon:const Icon(Icons.more_horiz_rounded)),
-      if(primary==null)Expanded(child:OutlinedButton.icon(
-        onPressed:()=>showTideActions(context,actions,title:title),
-        icon:const Icon(Icons.more_horiz_rounded),label:const CopyText('Actions'))),
-    ]));
+    Widget more(List<TideAction> items,String label)=>OutlinedButton.icon(onPressed:()=>showTideActions(context,items,title:title),icon:const Icon(Icons.tune_rounded,size:19),label:CopyText(label));
+    if(compact)return Padding(padding:const EdgeInsets.only(top:6),child:Align(alignment:Alignment.centerRight,child:actions.length==1&&!actions.single.destructive?TextButton.icon(onPressed:actions.single.onTap,icon:Icon(actions.single.icon,size:19),label:CopyText(actions.single.title)):more(actions,'Manage actions')));
+    return TideSurface(padding:const EdgeInsets.all(8),child:LayoutBuilder(builder:(c,box){
+      final main=primary==null?null:FilledButton.icon(onPressed:primary.onTap,icon:Icon(primary.icon,size:20),label:CopyText(primary.title,textAlign:TextAlign.center));
+      if(main==null)return SizedBox(width:double.infinity,child:more(actions,'Manage actions'));
+      if(rest.isEmpty)return SizedBox(width:double.infinity,child:main);
+      final secondary=more(rest,'More actions');
+      if(box.maxWidth<380||MediaQuery.textScalerOf(c).scale(14)>17)return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[main,const SizedBox(height:6),secondary]);
+      return Row(children:[Expanded(child:main),const SizedBox(width:8),secondary]);
+    }));
   }
 }

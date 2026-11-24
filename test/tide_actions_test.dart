@@ -34,7 +34,7 @@ void main(){
       TideAction(title:'Delete company',icon:Icons.delete_outline,onTap:()=>tapped='delete',destructive:true),
     ]))));
     expect(find.text('Edit branding'),findsNothing);
-    await tester.tap(find.byTooltip('More actions'));
+    await tester.tap(find.widgetWithText(OutlinedButton,'More actions'));
     await tester.pumpAndSettle();
     expect(find.text('Edit branding'),findsOneWidget);
     expect(find.text('Delete company'),findsOneWidget);
