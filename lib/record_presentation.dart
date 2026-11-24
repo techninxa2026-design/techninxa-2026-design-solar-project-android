@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'api.dart';
 import 'copy.dart';
 import 'tide_interactions.dart';
+import 'accessibility_catalog.dart';
 
 /// Resolve display names without modifying the API record or its wire IDs.
 String displayRole(dynamic code,Map<String,dynamic> source,{dynamic name}){
@@ -14,7 +15,7 @@ String displayRole(dynamic code,Map<String,dynamic> source,{dynamic name}){
 String displayPower(dynamic code,Map<String,dynamic> source){
  final all=[...rows(source['availablePowers']),...rows(source['effectivePowers']),...rows(source['navigation'])];
  final match=all.where((x)=>x['code']==code).firstOrNull;
- return (match?['label']??match?['title'])?.toString()??'Accessibility option';
+ return accessName(code?.toString()??'',serverLabel:(match?['label']??match?['title'])?.toString());
 }
 Map<String,dynamic> displayRecord(Map<String,dynamic> record,Map<String,dynamic> source){
  final out={...record};
