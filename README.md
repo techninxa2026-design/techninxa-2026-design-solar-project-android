@@ -16,6 +16,10 @@ Linux: bash setup-android.sh --build-debug. Setup restores only missing Gradle w
 
 The Android toolchain restores the original Flutter 3.47 template: Gradle 9.3.1, AGP 9.1.0 and Kotlin 2.4.0. The Gradle JVM may use Java 25; Android source/target bytecode remains Java 17. The template's legacy DSL/Kotlin flags retain compatibility with existing Flutter plugins. No JDK installation or global Flutter JDK setting is required. CI uses Flutter 3.47.0 and Java 25. The new configuration must pass CI and local builds before release.
 
+## Android API 36 and file selection
+
+Flutter 3.47 defaults to Android compile SDK 36. file_picker 8.3.7 hardcodes API 34 and fails AAR metadata checks against the updated lifecycle library. file_picker 11.0.3 uses Flutter's compile SDK, includes upstream path-traversal and MIME fixes, and retains the older secure-storage stack's compatible Win32 dependency. The Dart picker calls use the v11 static methods. A scoped Gradle workaround explicitly applies Kotlin only to file_picker when AGP 9 is running with android.builtInKotlin=false (upstream issue #2200). Do not edit the Pub cache, disable AAR validation, or change the Android minSdk/targetSdk to solve this compile-only mismatch. Keep Android SDK Platform 36 installed. This combination needs CI/device verification.
+
 ## Architecture
 
 - lib/api.dart: HTTPS transport, rotating JWT sessions, secure storage, workspace tickets, JSON/form/multipart requests; no automatic write replay.
