@@ -14,7 +14,8 @@ class ApiFailure implements Exception {
   final String? code;
   final String? traceId;
   final List<String> fields;
-  ApiFailure(this.status,this.message,[this.code,this.traceId,this.fields=const []]);
+  final Map<String,String> fieldErrors;
+  ApiFailure(this.status,this.message,[this.code,this.traceId,this.fields=const [],this.fieldErrors=const {}]);
   @override String toString()=>[message,if(status>0)'HTTP $status',if(fields.isNotEmpty)'Check: ${fields.join(', ')}',if(traceId!=null)'Reference: $traceId'].join('\n');
 }
 class Upload {
@@ -135,7 +136,7 @@ class Api extends ChangeNotifier {
     };
     final detail=status>=400&&status<500?_safeTitle(e['title']):null;
     final code=e['code']?.toString();
-    throw ApiFailure(status,detail??fallback,code,_trace(r,e),safeFields);
+    final errors=<String,String>{};final rawErrors=obj(e['errors']);for(final f in safeFields){final v=rawErrors[f];final message=_safeTitle(v is List&&v.isNotEmpty?v.first:v);if(message!=null)errors[f]=message;}throw ApiFailure(status,detail??fallback,code,_trace(r,e),safeFields,errors);
   }
   @override void dispose(){_http.close();super.dispose();}
 }
