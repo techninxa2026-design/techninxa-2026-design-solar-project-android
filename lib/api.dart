@@ -79,7 +79,7 @@ class Api extends ChangeNotifier {
     if(path.startsWith('/commands/')&&method=='POST'&&mode!='urlencoded'&&mode!='formdata')throw ApiFailure(400,'Unable to submit this form. Update the app and try again.');
     final used=_access;
     final resp=await _send(method,path,auth,mode,data,query,binary);
-    if(resp.statusCode==401&&auth&&_refresh!=null){if(_access==used)await refresh(); if(method!='GET')throw ApiFailure(401,'Session renewed. Review and submit the action again.');return _decode(await _send(method,path,auth,mode,data,query,binary),binary,path:path,twoFactor:data.containsKey('authenticatorCode'));}
+    if(resp.statusCode==401&&auth&&_refresh!=null){if(_access==used)await refresh(); if(method!='GET')throw ApiFailure(401,'Session renewed. Please submit again.');return _decode(await _send(method,path,auth,mode,data,query,binary),binary,path:path,twoFactor:data.containsKey('authenticatorCode'));}
     return _decode(resp,binary,path:path,twoFactor:data.containsKey('authenticatorCode'));
   }
   Future<http.Response> _send(String method,String path,bool auth,String mode,Map<String,dynamic> data,Map<String,dynamic> query,bool binary) async {
