@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/idcolda_logo"
-    android:gravity="fill"
-    android:filter="true" />
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/idcolda_icon_background" />
+    <item>
+        <inset android:drawable="@drawable/idcolda_logo" android:inset="10%" />
+    </item>
+</layer-list>
