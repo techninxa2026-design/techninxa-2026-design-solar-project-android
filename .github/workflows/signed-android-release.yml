@@ -46,9 +46,9 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -z "$KEYSTORE_B64" || -z "$STORE_PASSWORD" || -z "$KEY_ALIAS" || -z "$KEY_PASSWORD" ]]; then
-            echo "::warning::Release signing secrets are not configured; validation ran but no signed APK will be built."
+            echo "::error::Release signing secrets are not configured; no signed APK can be built or published."
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            exit 1
           fi
           umask 077
           printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/idcolda-release.jks"
@@ -73,7 +73,7 @@ jobs:
           cp "$apk" "release/IDCOLDA-$version_code.apk"
           cd release
           sha256sum "IDCOLDA-$version_code.apk" > SHA256SUMS.txt
-      - name: Store signed APK for administrator review
+      - name: Store signed APK artifact
         if: steps.signing.outputs.ready == 'true'
         uses: actions/upload-artifact@v4
         with:
@@ -81,6 +81,46 @@ jobs:
           path: release/
           if-no-files-found: error
           retention-days: 14
+      - name: Publish signed APK automatically to IDCOLDA
+        if: steps.signing.outputs.ready == 'true'
+        shell: bash
+        env:
+          PUBLISH_TOKEN: ${{ secrets.IDCOLDA_PUBLISH_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$PUBLISH_TOKEN" =~ ^[a-fA-F0-9]{64}$ ]]; then
+            echo "::error::Configure IDCOLDA_PUBLISH_TOKEN on GitHub and the MVC server before publishing."
+            exit 1
+          fi
+          # Do not publish an old commit if the workflow was queued or rerun.
+          current_head=$(git ls-remote origin refs/heads/feature/idcolda-native-android | cut -f1)
+          if [[ "$current_head" != "$GITHUB_SHA" ]]; then
+            echo "A newer commit is queued; skip outdated publication."
+            exit 0
+          fi
+          build=$((10000 + GITHUB_RUN_NUMBER))
+          apk="release/IDCOLDA-$build.apk"
+          digest=$(sha256sum "$apk" | cut -d ' ' -f1)
+          # Fetch the current release first; a retry after successful publication is safe.
+          manifest=$(curl --fail --silent --show-error --connect-timeout 15 --max-time 60 https://idcoldrs.com/api/v1/public/android-release)
+          current=$(jq -er 'if .available == true then .versionCode elif .available == false then 0 else error("invalid manifest") end' <<< "$manifest")
+          if (( current > build )); then
+            echo "::error::The server already has a higher build number. Increase the CI build number offset."
+            exit 1
+          fi
+          if (( current == build )); then
+            [[ $(jq -r '.sha256' <<< "$manifest") == "$digest" ]] || { echo "::error::Build number already exists with different bytes."; exit 1; }
+          else
+            response=$(curl --fail-with-body --silent --show-error --connect-timeout 30 --max-time 900 \
+              --header "Authorization: Bearer $PUBLISH_TOKEN" \
+              --form "apk=@$apk;type=application/vnd.android.package-archive" \
+              --form "notes=Automated Android release $build" \
+              https://idcoldrs.com/app/ci/publish)
+            jq -e --argjson build "$build" --arg sha "$digest" '.versionCode == $build and .sha256 == $sha' <<< "$response" >/dev/null
+          fi
+          manifest=$(curl --fail --silent --show-error --connect-timeout 15 --max-time 60 https://idcoldrs.com/api/v1/public/android-release)
+          jq -e --argjson build "$build" --arg sha "$digest" '.available == true and .versionCode == $build and .sha256 == $sha' <<< "$manifest" >/dev/null
+          echo "Published IDCOLDA build $build successfully. QR download and update manifest are synchronized."
       - name: Remove temporary signing material
         if: always()
         run: rm -f "$RUNNER_TEMP/idcolda-release.jks"
