@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 final class AndroidUpdater {
+    private static final class ReleaseChangedException extends IOException {}
     private static final long LIMIT = 200L * 1024 * 1024;
     private static final AtomicBoolean BUSY = new AtomicBoolean(false);
     private static final String BASE = "https://idcoldrs.com/app/download/";
@@ -70,7 +71,9 @@ final class AndroidUpdater {
                     conn.setRequestProperty("Accept-Encoding", "identity");
                     MessageDigest digest = MessageDigest.getInstance("SHA-256");
                     try {
-                        if (conn.getResponseCode() != 200) throw new IOException("download");
+                        int status = conn.getResponseCode();
+                        if (status == 404 || status == 410) throw new ReleaseChangedException();
+                        if (status != 200) throw new IOException("download");
                         long declared = conn.getContentLengthLong();
                         if (declared >= 0 && declared != size.longValue()) throw new IOException("length");
                         try (InputStream input = conn.getInputStream(); FileOutputStream output = new FileOutputStream(target)) {
@@ -113,10 +116,11 @@ final class AndroidUpdater {
                 } catch (Exception e) {
                     if (target != null) target.delete();
                     final boolean invalid = e instanceof SecurityException;
+                    final boolean replaced = e instanceof ReleaseChangedException;
                     activity.runOnUiThread(() -> {
                         BUSY.set(false);
-                        result.error(invalid?"verification":"download",
-                            invalid?"The APK does not match the installed IDCOLDA app.":"Download failed. Check your connection and try again.",null);
+                        result.error(replaced?"release_changed":invalid?"verification":"download",
+                            replaced?"A newer release is available. Checking again.":invalid?"The APK does not match the installed IDCOLDA app.":"Download failed. Check your connection and try again.",null);
                     });
                 }
             }, "idcolda-apk-update").start();

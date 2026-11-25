@@ -5,7 +5,10 @@ void main(){
  test('prompts only for newer enabled builds',(){
   final r=AndroidRelease.parse(manifest())!;
   expect(r.shouldPrompt(2),isTrue);expect(r.shouldPrompt(3),isFalse);expect(r.shouldPrompt(4),isFalse);
-  expect(AndroidRelease.parse({...manifest(),'promptEnabled':false})!.shouldPrompt(2),isFalse);
+  final quiet=AndroidRelease.parse({...manifest(),'promptEnabled':false})!;
+  expect(quiet.shouldPrompt(2),isFalse);
+  expect(quiet.isNewerThan(2),isTrue); // Manual check must work with the prompt off.
+  expect(quiet.isNewerThan(3),isFalse);
  });
  test('invalid manifests cannot start downloads',(){
   expect(AndroidRelease.parse({'available':false}),isNull);

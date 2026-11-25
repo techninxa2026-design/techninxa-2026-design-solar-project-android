@@ -19,7 +19,8 @@ class AndroidRelease {
      hash is! String||!RegExp(r'^[a-f0-9]{64}$').hasMatch(hash)||version is! String||version.isEmpty)return null;
   return AndroidRelease(code,bytes,version,hash,value['notes'] is String?value['notes'] as String:'',value['promptEnabled']==true);
  }
- bool shouldPrompt(int installed)=>prompt&&code>installed;
+ bool isNewerThan(int installed)=>code>installed;
+ bool shouldPrompt(int installed)=>prompt&&isNewerThan(installed);
 }
 
 /// One coordinator per app lifetime. Network failures never block sign-in.
@@ -47,8 +48,9 @@ class AndroidUpdateCoordinator with WidgetsBindingObserver {
   _checking=true;
   try{
    final installed=await channel.invokeMapMethod<String,dynamic>('installedVersion');
-   final code=installed?['code'];if(code is! int)return;
+   final code=installed?['code'];if(code is! int)throw StateError('installed version unavailable');
    final request=http.Request('GET',Uri.https('idcoldrs.com','/api/v1/public/android-release'))..followRedirects=false;
+   request.headers['Cache-Control']='no-cache, no-store';
    final response=await _client.send(request).timeout(const Duration(seconds:10));
    if(response.statusCode!=200){await response.stream.drain<void>().timeout(const Duration(seconds:10));throw StateError('unavailable');}
    final data=<int>[];
@@ -56,17 +58,20 @@ class AndroidUpdateCoordinator with WidgetsBindingObserver {
     if(data.length+part.length>16384)throw StateError('metadata');
     data.addAll(part);
    }
-   final release=AndroidRelease.parse(jsonDecode(utf8.decode(data)));
+   final decoded=jsonDecode(utf8.decode(data));
+   final release=AndroidRelease.parse(decoded);
+   if(release==null&&(decoded is! Map||decoded['available']!=false))throw const FormatException('Invalid update manifest');
    if(_disposed||!_foreground||!ready())return;
    final nav=navigator.currentState;
    if(nav==null||!nav.mounted)return;
-   if(release==null||release.code<=code){
+   if(release==null||!release.isNewerThan(code)){
     if(manual)ScaffoldMessenger.maybeOf(nav.context)?.showSnackBar(const SnackBar(content:Text('No newer version is available.')));
     return;
    }
    if(!manual&&(!release.shouldPrompt(code)||_lastPrompt==release.code||nav.canPop()))return;
    _lastPrompt=release.code;
-   await showDialog<void>(context:nav.context,barrierDismissible:false,builder:(_)=>_UpdateDialog(release:release));
+   final refresh=await showDialog<bool>(context:nav.context,barrierDismissible:false,builder:(_)=>_UpdateDialog(release:release));
+   if(refresh==true&&!_disposed){_lastPrompt=null;_checking=false;await check(manual:true);}
   }catch(_){
    if(manual&&!_disposed){final context=navigator.currentContext;if(context!=null&&context.mounted)ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content:Text('Could not check for updates. Try again later.')));}
   }finally{_checking=false;}
@@ -99,6 +104,7 @@ class _UpdateDialogState extends State<_UpdateDialog>{
    else if(result=='installer'){busy.value=false;Navigator.pop(context);}
    else {message.value='Unable to start installation. Try again.';}
   }on PlatformException catch(e){
+   if(mounted&&e.code=='release_changed'){busy.value=false;Navigator.pop(context,true);return;}
    if(mounted)message.value=switch(e.code){
     'verification'=>'This update is not compatible with your installed app. Contact your administrator.',
     'download'=>'Download failed. Check your internet connection and try again.',
