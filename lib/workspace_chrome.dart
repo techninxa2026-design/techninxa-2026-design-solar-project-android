@@ -64,7 +64,7 @@ class WorkspaceNavigation extends StatelessWidget{
      final active=n.key==selected;
      return Expanded(child:Semantics(button:true,selected:active,label:tr(c,n.label),
       child:Tooltip(message:tr(c,n.label),excludeFromSemantics:true,child:InkWell(
-       key:ValueKey('nav-'+n.key),onTap:()=>onSelect(n.key),splashColor:Colors.white24,highlightColor:Colors.white12,
+       key:ValueKey('nav-${n.key}'),onTap:()=>onSelect(n.key),splashColor:Colors.white24,highlightColor:Colors.white12,
        child:Center(child:AnimatedContainer(
         duration:MediaQuery.disableAnimationsOf(c)?Duration.zero:const Duration(milliseconds:180),
         width:48,height:42,decoration:BoxDecoration(color:active?Colors.white.withValues(alpha:.17):Colors.transparent,borderRadius:BorderRadius.circular(14)),

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'api.dart';
-import 'catalog.dart';
 import 'copy.dart';
 import 'tide_cards.dart';
-import 'tide_interactions.dart';
 
 class WorkspaceDestination{
  final String title,module,group,description;final String? power,focus;
@@ -98,7 +96,7 @@ class _WorkspaceSearchResultsState extends State<WorkspaceSearchResults>{
   for(final item in results){(grouped[item.group]??=[]).add(item);}
   return Padding(padding:const EdgeInsets.fromLTRB(16,8,16,0),child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
    TextField(controller:controller,autofocus:true,textInputAction:TextInputAction.search,decoration:InputDecoration(hintText:tr(c,'Search features you can access'),prefixIcon:const Icon(Icons.search_rounded),suffixIcon:query.isEmpty?null:IconButton(tooltip:'Clear search',onPressed:(){controller.clear();setState(()=>query='');},icon:const Icon(Icons.close))),onChanged:(v)=>setState(()=>query=v),onSubmitted:(_){if(results.length==1)Navigator.pop(c,results.single);}),
-   const SizedBox(height:12),CopyText(query.trim().isEmpty?'Available features':results.length.toString()+' matching features',style:t.textTheme.titleMedium),
+   const SizedBox(height:12),CopyText(query.trim().isEmpty?'Available features':'${results.length} matching features',style:t.textTheme.titleMedium),
    const SizedBox(height:8),Expanded(child:ListView(key:const ValueKey('feature-results'),children:[
     if(results.isEmpty)const TideEmpty(message:'No matching features. Try a different word.'),
     for(final group in grouped.entries)...[

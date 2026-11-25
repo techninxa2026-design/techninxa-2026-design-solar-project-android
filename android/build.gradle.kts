@@ -38,6 +38,19 @@ subprojects {
     }
 }
 
+// CameraX 1.5.3 exposes a JSpecify-annotated field whose type is a
+// runtime-only transitive dependency. Gradle 9 does not put that type on
+// the Java compile classpath. Declare it on the plugin that compiles it,
+// not only on :app. Matches upstream flutter/flutter#183515.
+// Remove once the resolved camera-core version includes the upstream fix.
+subprojects {
+    if (name == "camera_android_camerax") {
+        pluginManager.withPlugin("com.android.library") {
+            dependencies.add("implementation", "androidx.concurrent:concurrent-futures:1.2.0")
+        }
+    }
+}
+
 subprojects {
     project.evaluationDependsOn(":app")
 }

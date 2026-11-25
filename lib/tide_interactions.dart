@@ -41,7 +41,7 @@ class _TideChoiceListState extends State<TideChoiceList>{
  final matches=widget.values.entries.where((e)=>tr(c,e.value).toLowerCase().contains(q)||e.value.toLowerCase().contains(q)).toList();
  return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
  if(widget.values.length>5)...[TextField(decoration:const InputDecoration(hintText:'Search options',prefixIcon:Icon(Icons.search_rounded)),onChanged:(v)=>setState(()=>query=v)),const SizedBox(height:12)],
- if(widget.multiple)...[Wrap(spacing:12,runSpacing:8,crossAxisAlignment:WrapCrossAlignment.center,children:[CopyText(selected.length.toString()+' selected',style:Theme.of(c).textTheme.titleSmall),FilledButton.icon(onPressed:()=>Navigator.pop(c,selected),icon:const Icon(Icons.check_rounded),label:const CopyText('Apply selection'))]),const SizedBox(height:8)],
+ if(widget.multiple)...[Wrap(spacing:12,runSpacing:8,crossAxisAlignment:WrapCrossAlignment.center,children:[CopyText('${selected.length} selected',style:Theme.of(c).textTheme.titleSmall),FilledButton.icon(onPressed:()=>Navigator.pop(c,selected),icon:const Icon(Icons.check_rounded),label:const CopyText('Apply selection'))]),const SizedBox(height:8)],
  if(matches.isEmpty)const TideEmpty(message:'No matching options.'),
  for(final entry in matches)Padding(padding:const EdgeInsets.only(bottom:7),child:TideSurface(tinted:selected.contains(entry.key),padding:const EdgeInsets.symmetric(horizontal:13,vertical:11),
  onTap:(){if(!widget.multiple){Navigator.pop(c,entry.key);return;}setState(()=>selected.contains(entry.key)?selected.remove(entry.key):selected.add(entry.key));},
@@ -54,19 +54,19 @@ class TideSelectField extends StatelessWidget{
  final String label,value;final Map<String,String> options;final bool required,enabled;final ValueChanged<String> onChanged;final String? serverError;
  const TideSelectField({super.key,required this.label,required this.value,required this.options,required this.required,required this.enabled,required this.onChanged,this.serverError});
  @override Widget build(BuildContext c)=>FormField<String>(key:ValueKey(value),initialValue:value,autovalidateMode:AutovalidateMode.onUserInteraction,
- validator:(v)=>required&&(v==null||v.isEmpty)?'Select '+label+'.':serverError,builder:(state)=>InkWell(borderRadius:BorderRadius.circular(17),onTap:!enabled?null:()async{
+ validator:(v)=>required&&(v==null||v.isEmpty)?'Select $label.':serverError,builder:(state)=>InkWell(borderRadius:BorderRadius.circular(17),onTap:!enabled?null:()async{
  final result=await showTideSheet<String>(c,title:label,subtitle:'Choose one option',icon:Icons.checklist_rounded,content:(_)=>TideChoiceList(values:{if(!required)'':'None',...options},selected:{value}));
  if(result!=null&&state.mounted&&c.mounted){state.didChange(result);onChanged(result);}
  },child:InputDecorator(decoration:InputDecoration(labelText:tr(c,label)+(required?' *':''),errorText:state.errorText,enabled:enabled),isEmpty:false,
  child:Row(children:[Expanded(child:CopyText(value.isEmpty?'Choose a value':options[value]??value,style:Theme.of(c).textTheme.bodyLarge)),const SizedBox(width:8),const Icon(Icons.expand_more_rounded)]))));
 }
-String tideColorHex(Color color)=>'#'+(color.toARGB32()&0xffffff).toRadixString(16).padLeft(6,'0').toUpperCase();
-Color? tideParseColor(String value)=>RegExp(r'^#[0-9A-Fa-f]{6}$').hasMatch(value)?Color(int.parse('ff'+value.substring(1),radix:16)):null;
+String tideColorHex(Color color)=>'#${(color.toARGB32()&0xffffff).toRadixString(16).padLeft(6,'0').toUpperCase()}';
+Color? tideParseColor(String value)=>RegExp(r'^#[0-9A-Fa-f]{6}$').hasMatch(value)?Color(int.parse('ff${value.substring(1)}',radix:16)):null;
 class TideColorField extends StatelessWidget{
  final String label,value;final bool required,enabled;final ValueChanged<String> onChanged;
  const TideColorField({super.key,required this.label,required this.value,required this.required,required this.enabled,required this.onChanged});
  @override Widget build(BuildContext c)=>FormField<String>(key:ValueKey(value),initialValue:value,autovalidateMode:AutovalidateMode.onUserInteraction,
- validator:(v)=>((v??'').isEmpty&&!required)||tideParseColor(v??'')!=null?null:'Select a valid '+label+'.',
+ validator:(v)=>((v??'').isEmpty&&!required)||tideParseColor(v??'')!=null?null:'Select a valid $label.',
  builder:(state){final color=tideParseColor(value);
  return InkWell(borderRadius:BorderRadius.circular(17),onTap:!enabled?null:()async{
  final picked=await showTideSheet<Color>(c,title:label,subtitle:'Choose a palette color or create your own shade.',icon:Icons.palette_outlined,content:(_)=>TideColorPicker(initial:color??ocean));
@@ -92,7 +92,7 @@ class _TideColorPickerState extends State<TideColorPicker>{
  Container(padding:const EdgeInsets.all(19),decoration:BoxDecoration(color:color,borderRadius:BorderRadius.circular(22)),child:Row(children:[
  Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[CopyText('Brand preview',style:TextStyle(color:foreground,fontSize:18,fontWeight:FontWeight.w800)),const SizedBox(height:5),Text(tideColorHex(color),style:TextStyle(color:foreground,fontSize:12))])),Icon(Icons.check_circle_outline,color:foreground,size:28)])),
  const SizedBox(height:16),const TideSection(title:'Curated palette'),const SizedBox(height:10),
- Wrap(spacing:10,runSpacing:10,children:colors.map((x)=>Semantics(button:true,selected:x.toARGB32()==color.toARGB32(),label:'Color '+tideColorHex(x),child:InkWell(borderRadius:BorderRadius.circular(15),onTap:()=>setState(()=>hsv=HSVColor.fromColor(x)),child:Container(width:48,height:48,decoration:BoxDecoration(color:x,borderRadius:BorderRadius.circular(15)),child:x.toARGB32()==color.toARGB32()?const Icon(Icons.check,color:Colors.white):null)))).toList()),
+ Wrap(spacing:10,runSpacing:10,children:colors.map((x)=>Semantics(button:true,selected:x.toARGB32()==color.toARGB32(),label:'Color ${tideColorHex(x)}',child:InkWell(borderRadius:BorderRadius.circular(15),onTap:()=>setState(()=>hsv=HSVColor.fromColor(x)),child:Container(width:48,height:48,decoration:BoxDecoration(color:x,borderRadius:BorderRadius.circular(15)),child:x.toARGB32()==color.toARGB32()?const Icon(Icons.check,color:Colors.white):null)))).toList()),
  const SizedBox(height:20),const TideSection(title:'Custom shade'),const SizedBox(height:12),
  Container(height:18,decoration:BoxDecoration(borderRadius:BorderRadius.circular(20),gradient:const LinearGradient(colors:[Colors.red,Colors.yellow,Colors.green,Colors.cyan,Colors.blue,Colors.purple,Colors.red]))),
  control('Hue',hsv.hue,360,(v)=>setState(()=>hsv=hsv.withHue(v))),

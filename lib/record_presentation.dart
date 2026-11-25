@@ -39,7 +39,7 @@ class BrandColorPreview extends StatelessWidget{
   final color=tideParseColor(value);
   if(color==null)return const CopyText('Color not configured');
   final ink=color.computeLuminance()>.179?Colors.black:Colors.white;
-  return Semantics(label:title,child:Container(key:ValueKey('brand-color-'+title),width:double.infinity,padding:const EdgeInsets.all(16),
+  return Semantics(label:title,child:Container(key:ValueKey('brand-color-$title'),width:double.infinity,padding:const EdgeInsets.all(16),
    decoration:BoxDecoration(color:color,borderRadius:BorderRadius.circular(16),border:Border.all(color:Theme.of(c).colorScheme.outline)),
    child:Row(children:[Icon(Icons.palette_outlined,color:ink),const SizedBox(width:10),Expanded(child:CopyText(title,style:TextStyle(color:ink,fontWeight:FontWeight.w700)))])));
  }

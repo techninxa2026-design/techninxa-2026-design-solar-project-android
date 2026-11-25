@@ -113,8 +113,8 @@ class TideProductPhoto extends StatefulWidget {
   @override State<TideProductPhoto> createState()=>_TideProductPhotoState();
 }
 class _TideProductPhotoState extends State<TideProductPhoto>{
-  late Future<Uint8List> image=widget.api.bytes('/inventory/products/'+widget.id.toString()+'/image');
-  @override void didUpdateWidget(covariant TideProductPhoto old){super.didUpdateWidget(old);if(old.api!=widget.api||old.id!=widget.id)image=widget.api.bytes('/inventory/products/'+widget.id.toString()+'/image');}
+  late Future<Uint8List> image=widget.api.bytes('/inventory/products/${widget.id}/image');
+  @override void didUpdateWidget(covariant TideProductPhoto old){super.didUpdateWidget(old);if(old.api!=widget.api||old.id!=widget.id)image=widget.api.bytes('/inventory/products/${widget.id}/image');}
   @override Widget build(BuildContext c)=>ClipRRect(borderRadius:BorderRadius.circular(17),child:Container(
     width:78,height:78,color:Colors.white,child:FutureBuilder<Uint8List>(future:image,builder:(c,s){
       final bytes=s.data;return bytes==null||bytes.isEmpty?const TideGlyph(Icons.inventory_2_outlined,size:78):

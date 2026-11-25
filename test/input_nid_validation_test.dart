@@ -18,7 +18,7 @@ void main(){
   const back='Blood Group A+ Issue Date 01 Jan 2020';
   expect(classifyNid(front,pdf417:false),NidEvidence.front);
   expect(classifyNid(back,pdf417:true),NidEvidence.back);
-  expect(classifyNid(front+' '+back,pdf417:true),NidEvidence.mixed);
+  expect(classifyNid('$front $back',pdf417:true),NidEvidence.mixed);
   expect(classifyNid('Random image',pdf417:false),NidEvidence.uncertain);
   expect(classifyNid('Unrelated barcode',pdf417:true),NidEvidence.uncertain);
   expect(nidSideError(NidSide.front,NidEvidence.back),isNotNull);

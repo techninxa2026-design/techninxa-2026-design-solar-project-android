@@ -32,7 +32,7 @@ class _CompanyLogoState extends State<CompanyLogo>{
     final match=RegExp(r'^/api/v1/companies/([1-9][0-9]*)/logo$').firstMatch(p);
     if(match!=null&&match.group(1)==widget.companyId?.toString()){
       future=fetch(p.substring('/api/v1'.length),true);
-    }else if(RegExp(r'^/company/[A-Za-z0-9-]+/logo$').hasMatch(p)&&p=='/company/'+widget.brand.slug+'/logo'){
+    }else if(RegExp(r'^/company/[A-Za-z0-9-]+/logo$').hasMatch(p)&&p=='/company/${widget.brand.slug}/logo'){
       future=fetch(p,false);
     }
   }
@@ -43,17 +43,17 @@ class _CompanyLogoState extends State<CompanyLogo>{
     final s=Theme.of(context).colorScheme;
     final fallback=Center(child:CopyText(widget.brand.initials.isEmpty?'ID':widget.brand.initials,
       style:TextStyle(color:widget.brand.deep,fontSize:widget.size*.31,fontWeight:FontWeight.w800)));
-    return Semantics(label:widget.brand.name+' logo',image:true,child:Container(
+    return Semantics(label:'${widget.brand.name} logo',image:true,child:Container(
       width:widget.size,height:widget.size,
       decoration:BoxDecoration(color:Colors.white,borderRadius:BorderRadius.circular(18),
         border:Border.all(color:s.outline.withValues(alpha:.65))),
       clipBehavior:Clip.antiAlias,
       child:FutureBuilder<Uint8List?>(future:future,builder:(context,snapshot){
         final data=snapshot.data;
-        if(data!=null&&data.isNotEmpty)return Padding(padding:const EdgeInsets.all(7),
-          child:Image.memory(data,fit:BoxFit.contain,errorBuilder:(_,__,___)=>fallback));
-        if(snapshot.connectionState==ConnectionState.waiting)return Center(
-          child:SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2,color:widget.brand.deep)));
+        if(data!=null&&data.isNotEmpty){return Padding(padding:const EdgeInsets.all(7),
+          child:Image.memory(data,fit:BoxFit.contain,errorBuilder:(_,__,___)=>fallback));}
+        if(snapshot.connectionState==ConnectionState.waiting){return Center(
+          child:SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2,color:widget.brand.deep)));}
         return fallback;
       }),
     ));
@@ -129,7 +129,7 @@ IconData actionIcon(String path,String method){
 
 Future<void> showTideActions(BuildContext context,List<TideAction> actions,{String title='Actions'})async{
  if(actions.isEmpty)return;
- final selected=await showTideSheet<TideAction>(context,title:title,subtitle:actions.length.toString()+' available operations',icon:Icons.bolt_rounded,content:(_)=>_TideActionMenu(actions:actions));
+ final selected=await showTideSheet<TideAction>(context,title:title,subtitle:'${actions.length} available operations',icon:Icons.bolt_rounded,content:(_)=>_TideActionMenu(actions:actions));
  if(selected!=null&&context.mounted)selected.onTap();
 }
 class _TideActionMenu extends StatefulWidget{

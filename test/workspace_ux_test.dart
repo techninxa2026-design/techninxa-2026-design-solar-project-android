@@ -20,7 +20,7 @@ void main(){
   final pages=workspaceDestinations(api);
   expect(matchPages(pages,'roles').single.title,'Create Roles');
   expect(matchPages(pages,'Manage Team'),isEmpty);
-  expect(matchPages(List.generate(25,(i)=>WorkspaceDestination('Page '+i.toString(),'roles','A')),'').length,20);
+  expect(matchPages(List.generate(25,(i)=>WorkspaceDestination('Page $i','roles','A')),'').length,20);
  });
  test('Hierarchy drag changes preserve revisions and reject cycles',(){
   expect(hierarchyChange(source,const HierarchyDrag('position',manager),'position',worker),isNull);
