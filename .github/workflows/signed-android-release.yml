@@ -1,7 +1,7 @@
 name: IDCOLDA signed Android release
 on:
   push:
-    branches: [feature/idcolda-native-android]
+    branches: [main]
     paths:
       - 'lib/**'
       - 'android/**'
@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   release:
-    if: github.ref == 'refs/heads/feature/idcolda-native-android'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -93,7 +93,7 @@ jobs:
             exit 1
           fi
           # Do not publish an old commit if the workflow was queued or rerun.
-          current_head=$(git ls-remote origin refs/heads/feature/idcolda-native-android | cut -f1)
+          current_head=$(git ls-remote origin refs/heads/main | cut -f1)
           if [[ "$current_head" != "$GITHUB_SHA" ]]; then
             echo "A newer commit is queued; skip outdated publication."
             exit 0
