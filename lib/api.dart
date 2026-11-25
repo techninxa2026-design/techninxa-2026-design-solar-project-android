@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'user_errors.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
@@ -16,8 +17,10 @@ class ApiFailure implements Exception {
   final List<String> fields;
   final Map<String,String> fieldErrors;
   ApiFailure(this.status,this.message,[this.code,this.traceId,this.fields=const [],this.fieldErrors=const {}]);
-  @override String toString()=>[message,if(status>0)'HTTP $status',if(fields.isNotEmpty)'Check: ${fields.map((f)=>fieldErrors[f]??f).join('; ')}',if(traceId!=null)'Reference: $traceId'].join('\n');
+  @override String toString()=>message;
+  String get diagnosticSummary=>[if(status>0)'HTTP $status',if(traceId!=null)'Reference: $traceId'].join(' | ');
 }
+String userError(Object? error)=>error is ApiFailure?error.message:'Something went wrong. Please try again.';
 class Upload {
   final String name;
   final Uint8List bytes;
@@ -44,7 +47,7 @@ class Api extends ChangeNotifier {
     catch(_){await clear();}
   }
   Future<void> _save(dynamic value,int generation) async {
-    final x=obj(value);if(x['accessToken'] is! String||x['refreshToken'] is! String)throw ApiFailure(502,'Invalid authentication response.');
+    final x=obj(value);if(x['accessToken'] is! String||x['refreshToken'] is! String)throw ApiFailure(502,'Unable to sign in. Please try again.');
     if(generation!=_generation)throw ApiFailure(401,'Session changed.');
     await storage.write(key:_storeKey,value:jsonEncode({'refreshToken':x['refreshToken']}));
     if(generation!=_generation){await storage.delete(key:_storeKey);throw ApiFailure(401,'Session changed.');}
@@ -64,20 +67,20 @@ class Api extends ChangeNotifier {
     _rotation=task;try{await task;}finally{if(identical(_rotation,task))_rotation=null;}
   }
   Future<void> loadMe() async {me=obj(await get('/auth/me'));notifyListeners();}
-  Future<void> selectWorkspace(int id) async {final v=obj(await request('POST','/workspace/select',mode:'raw',data:{'companyId':id}));workspaceTicket=v['workspaceTicket'] as String?;if(workspaceTicket==null)throw ApiFailure(502,'Missing workspace ticket.');await loadMe();}
+  Future<void> selectWorkspace(int id) async {final v=obj(await request('POST','/workspace/select',mode:'raw',data:{'companyId':id}));workspaceTicket=v['workspaceTicket'] as String?;if(workspaceTicket==null)throw ApiFailure(502,'Unable to open this workspace. Try again.');await loadMe();}
   Future<void> leaveWorkspace() async {workspaceTicket=null;await loadMe();}
   Future<void> clear() async {_generation++;_access=null;_refresh=null;workspaceTicket=null;me={};await storage.delete(key:_storeKey);notifyListeners();}
   Future<void> logout({bool all=false}) async {await request('POST',all?'/auth/logout-all':'/auth/logout');await clear();}
   Future<dynamic> get(String path,{Map<String,dynamic> query=const{},bool auth=true})=>request('GET',path,query:query,auth:auth);
   Future<Uint8List> bytes(String path,{bool auth=true}) async=>await request('GET',path,auth:auth,binary:true) as Uint8List;
   Future<dynamic> request(String method,String path,{bool auth=true,String mode='none',Map<String,dynamic> data=const{},Map<String,dynamic> query=const{},bool binary=false}) async {
-    if(!path.startsWith('/')||path.contains('..')||path.contains('?')||path.contains('#')||path.contains('://'))throw ApiFailure(400,'Invalid API path.');
+    if(!path.startsWith('/')||path.contains('..')||path.contains('?')||path.contains('#')||path.contains('://'))throw ApiFailure(400,'Unable to open this page.');
     if(auth&&_access==null)await refresh();
-    if(path.startsWith('/commands/')&&method=='POST'&&mode!='urlencoded'&&mode!='formdata')throw ApiFailure(400,'This operation requires form data.');
+    if(path.startsWith('/commands/')&&method=='POST'&&mode!='urlencoded'&&mode!='formdata')throw ApiFailure(400,'Unable to submit this form. Update the app and try again.');
     final used=_access;
     final resp=await _send(method,path,auth,mode,data,query,binary);
-    if(resp.statusCode==401&&auth&&_refresh!=null){if(_access==used)await refresh(); if(method!='GET')throw ApiFailure(401,'Session renewed. Review and submit the action again.');return _decode(await _send(method,path,auth,mode,data,query,binary),binary);}
-    return _decode(resp,binary);
+    if(resp.statusCode==401&&auth&&_refresh!=null){if(_access==used)await refresh(); if(method!='GET')throw ApiFailure(401,'Session renewed. Review and submit the action again.');return _decode(await _send(method,path,auth,mode,data,query,binary),binary,path:path,twoFactor:data.containsKey('authenticatorCode'));}
+    return _decode(resp,binary,path:path,twoFactor:data.containsKey('authenticatorCode'));
   }
   Future<http.Response> _send(String method,String path,bool auth,String mode,Map<String,dynamic> data,Map<String,dynamic> query,bool binary) async {
     // Public logos are the only allowed non-API paths; never send bearer credentials there.
@@ -106,13 +109,13 @@ class Api extends ChangeNotifier {
     final x=(e['traceId']??r.headers['x-idcolda-trace'])?.toString();
     return x!=null&&RegExp(r'^[A-Za-z0-9:._-]{1,128}$').hasMatch(x)?x:null;
   }
-  dynamic _decode(http.Response r,bool binary){
+  dynamic _decode(http.Response r,bool binary,{required String path,required bool twoFactor}){
     final status=r.statusCode;
     if(status>=200&&status<300){
       if(binary)return r.bodyBytes;
       if(r.bodyBytes.isEmpty)return null;
       try{return jsonDecode(utf8.decode(r.bodyBytes));}
-      catch(_){throw ApiFailure(502,'Unexpected non-JSON API response. Check whether the request already saved before retrying.',null,_trace(r,{}));}
+      catch(_){throw ApiFailure(502,'Unable to confirm the result. Check whether your changes were saved before trying again.',null,_trace(r,{}));}
     }
     Map<String,dynamic> e={};
     try{e=obj(jsonDecode(utf8.decode(r.bodyBytes)));}catch(_){}
@@ -136,7 +139,7 @@ class Api extends ChangeNotifier {
     };
     final detail=status>=400&&status<500?_safeTitle(e['title']):null;
     final code=e['code']?.toString();
-    final errors=<String,String>{};final rawErrors=obj(e['errors']);for(final f in safeFields){final v=rawErrors[f];final message=_safeTitle(v is List&&v.isNotEmpty?v.first:v);if(message!=null)errors[f]=message;}throw ApiFailure(status,detail??fallback,code,_trace(r,e),safeFields,errors);
+    final errors=<String,String>{};final rawErrors=obj(e['errors']);for(final f in safeFields){final v=rawErrors[f];final message=_safeTitle(v is List&&v.isNotEmpty?v.first:v);errors[f]=friendlyFieldError(f,detail:message??detail);}throw ApiFailure(status,friendlyResponse(status:status,path:path,code:code,detail:detail??fallback,fields:safeFields,twoFactor:twoFactor),code,_trace(r,e),safeFields,errors);
   }
   @override void dispose(){_http.close();super.dispose();}
 }

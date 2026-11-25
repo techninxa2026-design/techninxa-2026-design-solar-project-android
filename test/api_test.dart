@@ -52,7 +52,7 @@ void main(){
   test('MVC validation exposes HTTP status, field names and safe trace reference',()async{
     final a=Api(client:MockClient((_)async=>jsonResponse({'title':'Invalid or missing fields.','fields':['Name','Items[0].ProductId'],'traceId':'qa:0001'},400)));
     try{await a.request('POST','/public/register',auth:false,mode:'urlencoded',data:{'FullName':'Test'});fail('Expected validation failure');}
-    on ApiFailure catch(e){expect(e.status,400);expect(e.fields,['Name','Items[0].ProductId']);expect(e.traceId,'qa:0001');expect(e.toString(),contains('HTTP 400'));}
+    on ApiFailure catch(e){expect(e.status,400);expect(e.fields,['Name','Items[0].ProductId']);expect(e.traceId,'qa:0001');expect(e.toString(),isNot(contains('HTTP 400')));expect(e.toString(),isNot(contains('qa:0001')));expect(e.diagnosticSummary,contains('HTTP 400'));}
     a.dispose();
   });
   test('do not replay invalid commands or expose server exception bodies',()async{

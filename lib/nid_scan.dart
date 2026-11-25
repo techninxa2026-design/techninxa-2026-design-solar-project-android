@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show DeviceOrientation;
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart' as ocr;
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart' as bc;
 import 'api.dart';
@@ -118,9 +119,19 @@ class _NidScanPageState extends State<NidScanPage> with WidgetsBindingObserver{
   if(accepted!=null)return Image.memory(accepted!.bytes,fit:BoxFit.contain);
   if(opening)return const Center(child:CircularProgressIndicator());
   if(c==null||!c.value.isInitialized)return Center(child:Column(mainAxisSize:MainAxisSize.min,children:[Icon(Icons.credit_card_rounded,size:70,color:Theme.of(context).colorScheme.primary),const SizedBox(height:12),CopyText('Position the '+side+' side inside the frame')]));
-  return Stack(alignment:Alignment.center,children:[
-   Center(child:CameraPreview(c)),
-   IgnorePointer(child:FractionallySizedBox(widthFactor:.91,child:AspectRatio(aspectRatio:1.59,child:Container(decoration:BoxDecoration(border:Border.all(color:Colors.cyanAccent,width:3),borderRadius:BorderRadius.circular(16))))))
+  return Stack(fit:StackFit.expand,alignment:Alignment.center,children:[
+   Positioned.fill(child:ClipRect(child:ValueListenableBuilder<CameraValue>(
+    valueListenable:c,
+    builder:(context,value,_){
+     final orientation=value.lockedCaptureOrientation??value.deviceOrientation;
+     final landscape=orientation==DeviceOrientation.landscapeLeft||orientation==DeviceOrientation.landscapeRight;
+     final ratio=landscape?value.aspectRatio:1/value.aspectRatio;
+     return FittedBox(fit:BoxFit.cover,clipBehavior:Clip.hardEdge,
+      child:SizedBox(width:ratio*1000,height:1000,child:CameraPreview(c)));
+    },
+   ))),
+   IgnorePointer(child:Center(child:FractionallySizedBox(widthFactor:.91,
+    child:AspectRatio(aspectRatio:1.59,child:Container(decoration:BoxDecoration(border:Border.all(color:Colors.cyanAccent,width:3),borderRadius:BorderRadius.circular(16)))))))
   ]);
  }
  @override Widget build(BuildContext context){

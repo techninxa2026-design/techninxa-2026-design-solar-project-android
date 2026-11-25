@@ -28,7 +28,7 @@ class _AdminHomeState extends State<AdminHome>{
     ])),const SizedBox(width:8),TideAvatar(name.isEmpty?'Admin':name,size:48)]),
    const SizedBox(height:18),
    FutureBuilder<Map<String,dynamic>>(future:future,builder:(c,snapshot){
-    if(snapshot.hasError)return TideNotice(snapshot.error.toString(),title:'Unable to load companies',error:true,retry:reload);
+    if(snapshot.hasError)return TideNotice(userError(snapshot.error),title:'Unable to load companies',error:true,retry:reload);
     if(!snapshot.hasData)return const TideLoading();
     final data=snapshot.data!;final companies=rows(data['items']);final da=companies.where((r)=>r['companyKind']=='DemandAggregator').length;
     final installers=companies.where((r)=>r['companyKind']=='Installer').length;
@@ -74,7 +74,7 @@ class _NetworkOverview extends StatelessWidget{
      CopyText(total.toString(),style:const TextStyle(color:Colors.white,fontSize:52,height:1,fontWeight:FontWeight.w800,letterSpacing:-2)),
      const SizedBox(height:5),const CopyText('Registered companies',style:TextStyle(color:Colors.white,fontSize:15)),
      const SizedBox(height:14),ClipRRect(borderRadius:BorderRadius.circular(8),child:LinearProgressIndicator(value:pct,minHeight:9,backgroundColor:Colors.white24,valueColor:const AlwaysStoppedAnimation(Color(0xff80e4c6)))),
-     const SizedBox(height:10),Wrap(spacing:18,runSpacing:8,children:[_legend(const Color(0xff80e4c6),active.toString()+' active'),_legend(Colors.white54,inactive.toString()+' inactive')]),
+     const SizedBox(height:10),Wrap(spacing:18,runSpacing:8,children:[_legend(const Color(0xff80e4c6),activuserError(e)+' active'),_legend(Colors.white54,inactivuserError(e)+' inactive')]),
      const SizedBox(height:16),const Divider(color:Colors.white24,height:1),const SizedBox(height:12),
      LayoutBuilder(builder:(c,box){final items=[_metric(c,'Demand Aggregators',da,Icons.solar_power_outlined),_metric(c,'Installers',installers,Icons.engineering_outlined)];return box.maxWidth>=240&&MediaQuery.textScalerOf(c).scale(14)<=17?Row(crossAxisAlignment:CrossAxisAlignment.start,children:[Expanded(child:items[0]),const SizedBox(width:12),Expanded(child:items[1])]):Column(children:[items[0],const SizedBox(height:10),items[1]]);}),
     ])),
