@@ -46,6 +46,8 @@ android {
     }
     buildTypes {
         release {
+            // Retain Flutter/AGP optimization; suppress only unused optional OCR classes.
+            proguardFiles("proguard-rules.pro")
             if (releaseSigningReady) signingConfig = signingConfigs.getByName("idcoldaRelease")
         }
     }
