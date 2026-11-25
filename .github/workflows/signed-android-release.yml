@@ -11,7 +11,7 @@ concurrency:
 jobs:
   release:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -25,9 +25,7 @@ jobs:
           channel: stable
           cache: true
       - name: Configure Android SDK and Java
-        run: |
-          flutter config --jdk-dir="$JAVA_HOME"
-          sdkmanager --install "platforms;android-36" "build-tools;36.0.0"
+        run: bash Scripts/setup-ci-android-sdk.sh
       - name: Validate Flutter source
         run: bash setup-android.sh
       - name: Prepare release signing
