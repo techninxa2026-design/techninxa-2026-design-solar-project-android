@@ -1,3 +1,5 @@
+import 'package:get/get.dart';
+import 'reactive_state.dart';
 import 'package:flutter/material.dart';
 import 'api.dart';
 import 'copy.dart';
@@ -7,16 +9,18 @@ import 'tide_actions.dart';
 import 'tide_editorial.dart';
 
 class AdminHome extends StatefulWidget{
- final Api api;final Brand brand;final int unread;
+ final Api api;final Brand brand;final int unread;final RxInt? reactiveUnread;final int refreshRevision;
  final Future<void> Function() openCompanies,openNotifications,register,choose;
  final Future<void> Function(Map<String,dynamic>,Map<String,dynamic>) openCompany;
- const AdminHome({super.key,required this.api,required this.brand,required this.unread,required this.openCompanies,required this.openNotifications,required this.register,required this.choose,required this.openCompany});
+ const AdminHome({super.key,required this.api,required this.brand,required this.unread,this.reactiveUnread,this.refreshRevision=0,required this.openCompanies,required this.openNotifications,required this.register,required this.choose,required this.openCompany});
  @override State<AdminHome> createState()=>_AdminHomeState();
 }
 class _AdminHomeState extends State<AdminHome>{
- late Future<Map<String,dynamic>> future=load();String filter='all';
+ late final resource=ReactiveResource<Map<String,dynamic>>(load);final filter='all'.obs;
+ @override void didUpdateWidget(covariant AdminHome old){super.didUpdateWidget(old);if(old.refreshRevision!=widget.refreshRevision){reload();}}
+ @override void dispose(){resource.release();filter.close();super.dispose();}
  Future<Map<String,dynamic>> load()async=>obj(await widget.api.get('/companies'));
- Future<void> reload()async{if(!mounted)return;setState(()=>future=load());try{await future;}catch(_){}}
+ Future<void> reload()async{if(!mounted)return;try{await resource.reload(coalesce:true);}catch(_){}}
  Future<void> after(Future<void> Function() action)async{await action();if(mounted)await reload();}
  @override Widget build(BuildContext c){
   final t=Theme.of(c);final s=t.colorScheme;final name=widget.api.me['fullName']?.toString().trim()??'';
@@ -27,14 +31,13 @@ class _AdminHomeState extends State<AdminHome>{
      const SizedBox(height:5),const CopyText('Manage your solar company network.'),
     ])),const SizedBox(width:8),TideAvatar(name.isEmpty?'Admin':name,size:48)]),
    const SizedBox(height:18),
-   FutureBuilder<Map<String,dynamic>>(future:future,builder:(c,snapshot){
+   ReactiveResourceBuilder<Map<String,dynamic>>(resource:resource,builder:(c,snapshot){
     if(snapshot.hasError)return TideNotice(userError(snapshot.error),title:'Unable to load companies',error:true,retry:reload);
     if(!snapshot.hasData)return const TideLoading();
     final data=snapshot.data!;final companies=rows(data['items']);final da=companies.where((r)=>r['companyKind']=='DemandAggregator').length;
     final installers=companies.where((r)=>r['companyKind']=='Installer').length;
     final active=companies.where((r)=>r['active']==true).length;
     final inactive=companies.length-active;final counts=obj(data['memberCounts']);
-    final matches=companies.where((r)=>switch(filter){'da'=>r['companyKind']=='DemandAggregator','installer'=>r['companyKind']=='Installer','inactive'=>r['active']!=true,_=>true}).toList();
     return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
      _NetworkOverview(total:companies.length,active:active,inactive:inactive,da:da,installers:installers,brand:widget.brand,onOpen:()=>after(widget.openCompanies)),
      const SizedBox(height:20),const TideSection(title:'Manage your network',subtitle:'Choose what you want to do'),const SizedBox(height:10),
@@ -45,20 +48,27 @@ class _AdminHomeState extends State<AdminHome>{
       ];
       return box.maxWidth>=280&&MediaQuery.textScalerOf(c).scale(14)<=17?Row(crossAxisAlignment:CrossAxisAlignment.start,children:[Expanded(child:tiles[0]),const SizedBox(width:10),Expanded(child:tiles[1])]):Column(children:[tiles[0],const SizedBox(height:10),tiles[1]]);
      }),
-     const SizedBox(height:10),TideSurface(onTap:widget.openNotifications,padding:const EdgeInsets.all(13),child:Row(children:[
-      const TideGlyph(Icons.notifications_active_outlined,size:44),const SizedBox(width:12),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[CopyText('Notifications',style:t.textTheme.titleSmall),CopyText(widget.unread==0?'No unread notifications':widget.unread.toString()+' unread updates',style:t.textTheme.bodySmall)])),
-      if(widget.unread>0)Badge(label:Text(widget.unread.toString())),const SizedBox(width:6),const Icon(Icons.chevron_right_rounded),
-     ])),
+     const SizedBox(height:10),if(widget.reactiveUnread==null)_notifications(t,widget.unread)else Obx(()=>_notifications(t,widget.reactiveUnread!.value)),
      const SizedBox(height:24),TideSection(title:'Company directory',subtitle:'Open a company to see its details',trailing:TextButton(onPressed:()=>after(widget.openCompanies),child:const CopyText('View all'))),
-     const SizedBox(height:8),Wrap(spacing:6,runSpacing:6,children:[
-      for(final x in [('all','All'),('da','DA'),('installer','Installer'),('inactive','Inactive')])ChoiceChip(label:CopyText(x.$2),selected:filter==x.$1,onSelected:(_)=>setState(()=>filter=x.$1)),
+     Obx(()=>_directory(companies,counts,data)),
+    ]);
+   }),
+  ]));
+ }
+ Widget _notifications(ThemeData t,int unread)=>TideSurface(onTap:widget.openNotifications,padding:const EdgeInsets.all(13),child:Row(children:[
+      const TideGlyph(Icons.notifications_active_outlined,size:44),const SizedBox(width:12),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[CopyText('Notifications',style:t.textTheme.titleSmall),CopyText(unread==0?'No unread notifications':unread.toString()+' unread updates',style:t.textTheme.bodySmall)])),
+      if(unread>0)Badge(label:Text(unread.toString())),const SizedBox(width:6),const Icon(Icons.chevron_right_rounded),
+     ]));
+ Widget _directory(List<Map<String,dynamic>> companies,Map<String,dynamic> counts,Map<String,dynamic> data){
+ final selected=filter.value;
+ final matches=companies.where((r)=>switch(selected){'da'=>r['companyKind']=='DemandAggregator','installer'=>r['companyKind']=='Installer','inactive'=>r['active']!=true,_=>true}).toList();
+ return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[const SizedBox(height:8),Wrap(spacing:6,runSpacing:6,children:[
+      for(final x in [('all','All'),('da','DA'),('installer','Installer'),('inactive','Inactive')])ChoiceChip(label:CopyText(x.$2),selected:selected==x.$1,onSelected:(_)=>filter.value=x.$1),
      ]),
      const SizedBox(height:10),if(matches.isEmpty)const TideEmpty(message:'No companies in this category.'),
      for(final row in matches.take(5))Padding(padding:const EdgeInsets.only(bottom:9),child:_CompanyRow(api:widget.api,row:row,count:counts[row['id'].toString()],onTap:()=>after(()=>widget.openCompany(row,data)))),
      if(matches.length>5)OutlinedButton.icon(onPressed:()=>after(widget.openCompanies),icon:const Icon(Icons.apartment_outlined),label:const CopyText('View company directory')),
     ]);
-   }),
-  ]));
  }
 }
 class _NetworkOverview extends StatelessWidget{

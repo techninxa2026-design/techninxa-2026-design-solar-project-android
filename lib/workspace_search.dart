@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'api.dart';
 import 'copy.dart';
@@ -79,8 +80,8 @@ class WorkspaceSearchResults extends StatefulWidget{
  @override State<WorkspaceSearchResults> createState()=>_WorkspaceSearchResultsState();
 }
 class _WorkspaceSearchResultsState extends State<WorkspaceSearchResults>{
- final controller=TextEditingController();String query='';
- @override void dispose(){controller.dispose();super.dispose();}
+ final controller=TextEditingController();final searchQuery=''.obs;
+ @override void dispose(){controller.dispose();searchQuery.close();super.dispose();}
  IconData iconFor(String module)=>switch(module){
   'companies'||'register-company'||'choose-workspace'=>Icons.apartment_rounded,
   'people'||'roles'||'accounts'||'applications'=>Icons.groups_outlined,
@@ -91,13 +92,10 @@ class _WorkspaceSearchResultsState extends State<WorkspaceSearchResults>{
   'sales'=>Icons.insights_outlined,_=>Icons.widgets_outlined,
  };
  @override Widget build(BuildContext c){
-  final t=Theme.of(c);final results=matchPages(widget.pages,query,translate:(x)=>tr(c,x));
-  final grouped=<String,List<WorkspaceDestination>>{};
-  for(final item in results){(grouped[item.group]??=[]).add(item);}
+  final t=Theme.of(c);
   return Padding(padding:const EdgeInsets.fromLTRB(16,8,16,0),child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[
-   TextField(controller:controller,autofocus:true,textInputAction:TextInputAction.search,decoration:InputDecoration(hintText:tr(c,'Search features you can access'),prefixIcon:const Icon(Icons.search_rounded),suffixIcon:query.isEmpty?null:IconButton(tooltip:'Clear search',onPressed:(){controller.clear();setState(()=>query='');},icon:const Icon(Icons.close))),onChanged:(v)=>setState(()=>query=v),onSubmitted:(_){if(results.length==1)Navigator.pop(c,results.single);}),
-   const SizedBox(height:12),CopyText(query.trim().isEmpty?'Available features':'${results.length} matching features',style:t.textTheme.titleMedium),
-   const SizedBox(height:8),Expanded(child:ListView(key:const ValueKey('feature-results'),children:[
+   Obx(()=>TextField(controller:controller,autofocus:true,textInputAction:TextInputAction.search,decoration:InputDecoration(hintText:tr(c,'Search features you can access'),prefixIcon:const Icon(Icons.search_rounded),suffixIcon:searchQuery.value.isEmpty?null:IconButton(tooltip:'Clear search',onPressed:(){controller.clear();searchQuery.value='';},icon:const Icon(Icons.close))),onChanged:(v)=>searchQuery.value=v,onSubmitted:(_){final results=matchPages(widget.pages,searchQuery.value,translate:(x)=>tr(c,x));if(results.length==1)Navigator.pop(c,results.single);})),
+   const SizedBox(height:12),Expanded(child:Obx((){final query=searchQuery.value;final results=matchPages(widget.pages,query,translate:(x)=>tr(c,x));final grouped=<String,List<WorkspaceDestination>>{};for(final item in results){(grouped[item.group]??=[]).add(item);}return Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[CopyText(query.trim().isEmpty?'Available features':'${results.length} matching features',style:t.textTheme.titleMedium),const SizedBox(height:8),Expanded(child:ListView(key:const ValueKey('feature-results'),children:[
     if(results.isEmpty)const TideEmpty(message:'No matching features. Try a different word.'),
     for(final group in grouped.entries)...[
      Padding(padding:const EdgeInsets.only(top:10,bottom:8),child:CopyText(group.key,style:t.textTheme.labelMedium?.copyWith(color:t.colorScheme.primary,fontWeight:FontWeight.w800))),
@@ -107,7 +105,7 @@ class _WorkspaceSearchResultsState extends State<WorkspaceSearchResults>{
       const SizedBox(width:6),Icon(Icons.chevron_right_rounded,color:t.colorScheme.primary),
      ]))),
     ],
-   ])),
+   ]))]);})),
   ]));
  }
 }

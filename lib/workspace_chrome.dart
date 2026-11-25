@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'copy.dart';
@@ -9,9 +10,10 @@ const workspaceBarShape=BorderRadius.vertical(bottom:Radius.circular(26));
 const workspaceNavShape=BorderRadius.vertical(top:Radius.circular(26));
 
 class WorkspaceHeader extends StatelessWidget implements PreferredSizeWidget{
- final Widget logo;final String title,subtitle;final int unread;final bool approved;
+ final Widget logo;final String title,subtitle;final int unread;final RxInt? reactiveUnread;final bool approved;
  final VoidCallback onNotifications,onAccount,onSearch;
- const WorkspaceHeader({super.key,required this.logo,required this.title,required this.subtitle,required this.unread,required this.approved,required this.onNotifications,required this.onAccount,required this.onSearch});
+ const WorkspaceHeader({super.key,required this.logo,required this.title,required this.subtitle,required this.unread,this.reactiveUnread,required this.approved,required this.onNotifications,required this.onAccount,required this.onSearch});
+ Widget _notification(Color color,int unread)=>IconButton(tooltip:'Notifications',color:Colors.white,onPressed:onNotifications,icon:Badge(isLabelVisible:unread>0,backgroundColor:Colors.white,textColor:color,label:Text(unread>99?'99+':unread.toString()),child:const Icon(Icons.notifications_rounded,size:24)));
  @override Size get preferredSize=>Size.fromHeight(approved?126:68);
  @override Widget build(BuildContext c){
   final color=workspaceBarColor(c);
@@ -28,7 +30,7 @@ class WorkspaceHeader extends StatelessWidget implements PreferredSizeWidget{
        CopyText(subtitle,style:const TextStyle(color:Colors.white,fontSize:11,fontWeight:FontWeight.w500,height:1.2),maxLines:1,overflow:TextOverflow.ellipsis),
       ]))))),
       const SizedBox(width:4),
-      IconButton(tooltip:'Notifications',color:Colors.white,onPressed:onNotifications,icon:Badge(isLabelVisible:unread>0,backgroundColor:Colors.white,textColor:color,label:Text(unread>99?'99+':unread.toString()),child:const Icon(Icons.notifications_rounded,size:24))),
+      if(reactiveUnread==null)_notification(color,unread)else Obx(()=>_notification(color,reactiveUnread!.value)),
       IconButton(tooltip:'Account',color:Colors.white,onPressed:onAccount,icon:const Icon(Icons.account_circle_rounded,size:27)),
      ])),
      if(approved)...[
