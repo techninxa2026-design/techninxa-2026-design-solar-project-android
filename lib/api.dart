@@ -16,7 +16,7 @@ class ApiFailure implements Exception {
   final List<String> fields;
   final Map<String,String> fieldErrors;
   ApiFailure(this.status,this.message,[this.code,this.traceId,this.fields=const [],this.fieldErrors=const {}]);
-  @override String toString()=>[message,if(status>0)'HTTP $status',if(fields.isNotEmpty)'Check: ${fields.join(', ')}',if(traceId!=null)'Reference: $traceId'].join('\n');
+  @override String toString()=>[message,if(status>0)'HTTP $status',if(fields.isNotEmpty)'Check: ${fields.map((f)=>fieldErrors[f]??f).join('; ')}',if(traceId!=null)'Reference: $traceId'].join('\n');
 }
 class Upload {
   final String name;

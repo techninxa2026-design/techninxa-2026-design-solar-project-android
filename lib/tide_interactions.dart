@@ -51,10 +51,10 @@ class _TideChoiceListState extends State<TideChoiceList>{
  }
 }
 class TideSelectField extends StatelessWidget{
- final String label,value;final Map<String,String> options;final bool required,enabled;final ValueChanged<String> onChanged;
- const TideSelectField({super.key,required this.label,required this.value,required this.options,required this.required,required this.enabled,required this.onChanged});
+ final String label,value;final Map<String,String> options;final bool required,enabled;final ValueChanged<String> onChanged;final String? serverError;
+ const TideSelectField({super.key,required this.label,required this.value,required this.options,required this.required,required this.enabled,required this.onChanged,this.serverError});
  @override Widget build(BuildContext c)=>FormField<String>(key:ValueKey(value),initialValue:value,autovalidateMode:AutovalidateMode.onUserInteraction,
- validator:(v)=>required&&(v==null||v.isEmpty)?'Select '+label+'.':null,builder:(state)=>InkWell(borderRadius:BorderRadius.circular(17),onTap:!enabled?null:()async{
+ validator:(v)=>required&&(v==null||v.isEmpty)?'Select '+label+'.':serverError,builder:(state)=>InkWell(borderRadius:BorderRadius.circular(17),onTap:!enabled?null:()async{
  final result=await showTideSheet<String>(c,title:label,subtitle:'Choose one option',icon:Icons.checklist_rounded,content:(_)=>TideChoiceList(values:{if(!required)'':'None',...options},selected:{value}));
  if(result!=null&&state.mounted&&c.mounted){state.didChange(result);onChanged(result);}
  },child:InputDecorator(decoration:InputDecoration(labelText:tr(c,label)+(required?' *':''),errorText:state.errorText,enabled:enabled),isEmpty:false,

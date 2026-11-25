@@ -18,7 +18,7 @@ NidEvidence classifyNid(String text,{required bool pdf417}){
  final dob=RegExp(r'DATE\s+OF\s+BIRTH|DOB').hasMatch(t);
  final name=RegExp(r'\bNAME\b').hasMatch(t);
  final number=RegExp(r'\b(?:NID|ID)\s*(?:NO|NUMBER|N0)?[.:\s]*\d[\d ]{8,20}').hasMatch(t);
- final front=header&&dob&&(name||number)&&RegExp(r'\d{4}').hasMatch(t);
+ final front=header&&dob&&name&&number&&RegExp(r'\d{4}').hasMatch(t);
  final backLabels=RegExp(r'BLOOD\s*GROUP|ISSUE\s*DATE|PLACE\s*OF\s*BIRTH').allMatches(t).length;
  final mrz=RegExp(r'(?:ID|I<|I)[A-Z<]*BGD[0-9A-Z<]{5,}|BGD[0-9A-Z<]{8,}').hasMatch(t)&&t.contains('<<');
  final back=mrz||(pdf417&&backLabels>=1);
@@ -98,6 +98,7 @@ class _NidScanPageState extends State<NidScanPage> with WidgetsBindingObserver{
   final file=File(path);
   if(await file.length()>2000000){if(mounted)setState(()=>error='Image exceeds 2 MB. Select a smaller clear image or retake it.');return;}
   final bytes=await file.readAsBytes();
+  if(bytes.length>2000000){if(mounted)setState(()=>error='Image exceeds 2 MB. Choose a smaller clear image.');return;}
   if(!nidImageType(bytes)){if(mounted)setState(()=>error='Choose a valid JPG, PNG or WebP image.');return;}
   final recognizer=ocr.TextRecognizer(script:ocr.TextRecognitionScript.latin);
   final scanner=bc.BarcodeScanner(formats:[bc.BarcodeFormat.pdf417]);
@@ -110,7 +111,7 @@ class _NidScanPageState extends State<NidScanPage> with WidgetsBindingObserver{
    final ext=bytes[0]==255?'jpg':bytes[0]==137?'png':'webp';
    setState(()=>accepted=Upload('nid-'+side+'.'+ext,bytes));
   }catch(_){if(mounted)setState(()=>error='The image could not be scanned. Use a sharp, supported image and retry.');}
-  finally{await recognizer.close();await scanner.close();}
+  finally{try{await recognizer.close();}finally{await scanner.close();}}
  }
  Widget preview(){
   final c=camera;
