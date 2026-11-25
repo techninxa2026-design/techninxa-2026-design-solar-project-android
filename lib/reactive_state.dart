@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 /// Route-owned state: no global cache or persistent company data.
 class ReactiveResource<T> extends GetxController {
- ReactiveResource(this.loader):current=Rx<Future<T>>(loader());
+ ReactiveResource(this.loader):current=Rx<Future<T>>(Future<T>.sync(loader)){_track(current.value);}
  final Future<T> Function() loader;
  final Rx<Future<T>> current;
  Future<T>? _refreshing;
@@ -12,11 +12,14 @@ class ReactiveResource<T> extends GetxController {
  Future<T> reload({bool coalesce=false}){
   if(_released)return Future<T>.error(StateError('Page closed'));
   if(coalesce&&_refreshing!=null)return _refreshing!;
-  final next=loader();
+  final next=Future<T>.sync(loader);
+  _track(next);
   current.value=next;
+  return next;
+ }
+ void _track(Future<T> next){
   _refreshing=next;
   next.then<void>((_){if(identical(_refreshing,next))_refreshing=null;},onError:(Object _,StackTrace __){if(identical(_refreshing,next))_refreshing=null;});
-  return next;
  }
  void release(){if(_released)return;_released=true;current.close();dispose();}
 }
