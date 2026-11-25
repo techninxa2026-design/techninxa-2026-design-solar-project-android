@@ -25,6 +25,7 @@ public class MainActivity extends FlutterActivity {
     private Runnable timeout;
     @Override public void configureFlutterEngine(FlutterEngine engine) {
         super.configureFlutterEngine(engine);
+        AndroidUpdater.register(this, engine.getDartExecutor().getBinaryMessenger());
         new MethodChannel(engine.getDartExecutor().getBinaryMessenger(), "idcolda/location")
             .setMethodCallHandler((call, result) -> {
                 if (!"currentLocation".equals(call.method)) { result.notImplemented(); return; }

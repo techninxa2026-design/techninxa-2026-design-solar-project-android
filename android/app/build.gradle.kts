@@ -4,6 +4,12 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val releaseStore = System.getenv("IDCOLDA_KEYSTORE")
+val releaseStorePassword = System.getenv("IDCOLDA_STORE_PASSWORD")
+val releaseAlias = System.getenv("IDCOLDA_KEY_ALIAS")
+val releaseKeyPassword = System.getenv("IDCOLDA_KEY_PASSWORD")
+val releaseSigningReady = listOf(releaseStore, releaseStorePassword, releaseAlias, releaseKeyPassword).all { !it.isNullOrBlank() }
+
 android {
     namespace = "com.techninxa.idcolda_ms"
     compileSdk = maxOf(flutter.compileSdkVersion, 36)
@@ -30,9 +36,17 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (releaseSigningReady) create("idcoldaRelease") {
+            storeFile = file(releaseStore!!)
+            storePassword = releaseStorePassword
+            keyAlias = releaseAlias
+            keyPassword = releaseKeyPassword
+        }
+    }
     buildTypes {
         release {
-            // Configure a release keystore separately; never commit signing secrets.
+            if (releaseSigningReady) signingConfig = signingConfigs.getByName("idcoldaRelease")
         }
     }
 }
@@ -46,3 +60,11 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+// A release APK must use the permanent distribution key.
+tasks.configureEach {
+    if (name == "assembleRelease" || name == "bundleRelease" || name == "packageRelease") {
+        doFirst { check(releaseSigningReady) { "Configure IDCOLDA release signing environment variables before building a release." } }
+    }
+}
+dependencies { implementation("androidx.core:core:1.15.0") }
