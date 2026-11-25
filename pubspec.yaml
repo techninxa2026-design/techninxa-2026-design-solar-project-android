@@ -27,3 +27,4 @@ flutter:
   assets:
     - assets/routes.json
     - assets/solar_network.png
+    - assets/idcolda_logo.webp

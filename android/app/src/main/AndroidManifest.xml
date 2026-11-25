@@ -9,7 +9,8 @@
         android:allowBackup="false"
         android:label="IDCOLDA"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/idcolda_launcher"
+        android:roundIcon="@mipmap/idcolda_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"
